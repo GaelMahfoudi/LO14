@@ -3,7 +3,7 @@
 #
 #
 
-
+clear
 
 ################## function ##################
 
@@ -32,8 +32,42 @@ Mode de connection :
 "
 }
 
+#Affiche la liste des commandes disponnibles et une petite aide
+function commandeList {
+	echo -e "
+exit : quitte rvsh  (Possibilité de taper 'e')
+clear : efface le contenu de l'écran (Possibilité de taper 'c')
+? : affiche la liste des commandes disponnibles. La syntaxe [nom_commande]? affiche l'aide pour cette commande.
+"
+}
 
 
+function handleMsg {
+	
+
+	msg=$1
+	
+	case "$msg" in
+	
+	#Gestion de la sortie
+	"exit" ) clear;
+		 exit;;
+	"e" ) clear;
+		 exit;;
+
+	#Effacement de l'écran
+	"clear" ) clear;;
+	"c" ) clear;;
+	"cl" ) clear;;
+
+
+	"?" ) commandeList;;
+
+	* ) echo "$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles";;
+	esac
+
+
+}
 
 
 
@@ -91,6 +125,7 @@ then
 	while [ ! "$cmd" = "exit" ]
 	do
 		read -p "$user@$machine > " cmd
+		handleMsg $cmd
 	done
 
 fi
@@ -102,6 +137,7 @@ then
 	while [ ! "$cmd" = "exit" ]
 	do
 		read -p "Admin@AdminMachine # " cmd
+		handleMsg $cmd
 	done
 
 fi
