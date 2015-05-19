@@ -23,14 +23,20 @@ machine=$3
 
 
 
-if [ ! $connectMode!="-connect" -o $connectMode!="-admin" ]
+
+
+if [ "$connectMode" != "-connect" ]
 then
+	if [ "$connectMode" != "-admin" ]
+	then
 		echo "Error"
+		exit
+	fi
 fi
 
  
 
-if [ "$connectMode"=="-connect" ]
+if [ "$connectMode" == "-connect" ]
 then
 
 	while [ ! "$cmd" = "exit" ]
@@ -41,12 +47,12 @@ then
 fi
 
 
-if [ "$connectMode"=="-admin" ]
+if [ "$connectMode" == "-admin" ]
 then
 
 	while [ ! "$cmd" = "exit" ]
 	do
-		read -p "$user@$machine \# " cmd
+		read -p "$user@$machine # " cmd
 	done
 
 fi
