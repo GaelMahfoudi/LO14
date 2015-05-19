@@ -41,31 +41,74 @@ clear : efface le contenu de l'écran (Possibilité de taper 'c')
 "
 }
 
+function host {
+
+    if [ ! -d /home/.rvsh/$1 ]
+    then
+        sudo mkdir /home/.rvsh/$1
+    fi
+
+}
+
 
 function handleMsg {
 	
-
-	msg=$1
+	tmp=($1)
+    
+	msg=${tmp[0]}
+	mode="$2"
+	param=${tmp[1]}
 	
-	case "$msg" in
+	echo "msg = $msg    param = $param"
 	
-	#Gestion de la sortie
-	"exit" ) clear;
-		 exit;;
-	"e" ) clear;
-		 exit;;
+	if [ $mode = "-connect" ]
+	then
+	    case "$msg" in
+	
+	        #Gestion de la sortie
+	        "exit" ) clear;
+		    exit;;
+	        "e" ) clear;
+		    exit;;
 
-	#Effacement de l'écran
-	"clear" ) clear;;
-	"c" ) clear;;
-	"cl" ) clear;;
+	        #Effacement de l'écran
+	        "clear" ) clear;;
+	        "c" ) clear;;
+	        "cl" ) clear;;
 
 
-	"?" ) commandeList;;
+	        "?" ) commandeList;;
 
-	* ) echo "$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles";;
-	esac
+	        * ) echo "$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles";;
+	    esac
+	    
+	else
+	
+	    case "$msg" in
+	
+	        #Gestion de la sortie
+	        "exit" ) clear;
+		    exit;;
+	        "e" ) clear;
+		    exit;;
 
+	        #Effacement de l'écran
+	        "clear" ) clear;;
+	        "c" ) clear;;
+	        "cl" ) clear;;
+	        
+	        #Création d'un hôte
+	        "host" ) host $param;;
+
+
+	        "?" ) commandeList;;
+
+	        * ) echo "$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles";;
+	    esac
+	    
+    fi
+    
+    
 
 }
 
@@ -131,7 +174,7 @@ then
 	while [ ! "$cmd" = "exit" ]
 	do
 		read -p "$user@$machine > " cmd
-		handleMsg $cmd
+		handleMsg "$cmd" $connectMode
 	done
 
 fi
@@ -142,8 +185,8 @@ then
 
 	while [ ! "$cmd" = "exit" ]
 	do
-		read -p "Admin@AdminMachine # " cmd
-		handleMsg $cmd
+		read -p "rvsh > " cmd
+		handleMsg "$cmd" $connectMode
 	done
 
 fi
