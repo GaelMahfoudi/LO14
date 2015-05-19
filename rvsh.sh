@@ -76,9 +76,9 @@ function handleMsg {
 
 #Initialisation de rvsh
 
-if [ ! -d "/home/opt/.rvsh" ]
+if [ ! -d /home/.rvsh ]
 then
-	mkdir "/home/opt/.rvsh"
+	sudo mkdir -p /home/.rvsh
 fi
 
 
