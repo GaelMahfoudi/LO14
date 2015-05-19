@@ -51,6 +51,7 @@ machine=$3
 
 
 
+#Ici se déroule la magie de l'aide
 if [ "$connectMode" == "-h" ]
 then
 	h
