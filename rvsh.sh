@@ -7,6 +7,33 @@
 
 ################## function ##################
 
+function badParam {
+	echo -e "
+Les paramètres entrés ne sont pas corrects. 
+Utilisation de rvsh : 
+rvsh [mode de connection] [utilisateur] [machine]
+Mode de connection :
+	-connect accéder aux machines en tant qu'utilisateur.
+	-admin accéder à l'interface administrateur
+
+"
+}
+
+
+function h {
+
+	echo -e "
+Utilisation de rvsh : 
+rvsh [mode de connection] [utilisateur] [machine]
+Mode de connection :
+	-connect accéder aux machines en tant qu'utilisateur.
+	-admin accéder à l'interface administrateur
+
+"
+}
+
+
+
 
 
 
@@ -24,13 +51,22 @@ machine=$3
 
 
 
+if [ "$connectMode" == "-h" ]
+then
+	h
+	exit
+fi
+
+
+
+
 #Gestion des erreurs de paramètres
 #TODO rendre les if plus compact si possible
 if [ "$connectMode" != "-connect" ]
 then
 	if [ "$connectMode" != "-admin" ]
 	then
-		echo "Error"
+		badParam
 		exit
 	fi
 fi
@@ -39,7 +75,7 @@ if [ "$connectMode" == "-connect" ]
 then
 	if [ "$user" == "" -o "$machine" == "" ]
 	then
-		echo "Error"
+		badParam
 		exit
 	fi 
 fi
