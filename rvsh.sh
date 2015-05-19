@@ -73,8 +73,13 @@ function handleMsg {
 
 ##################  Script  ##################
 
-cmd=""
 
+#Initialisation de rvsh
+
+if [ ! -d "/home/opt/.rvsh" ]
+then
+	mkdir "/home/opt/.rvsh"
+fi
 
 
 #Paramètre rvsh
@@ -115,7 +120,8 @@ then
 	fi 
 fi
 
-
+#variable qui reçoit les commandes saisies
+cmd=""
 
 
 #Démarrage du prompt suivant le mode de connection
