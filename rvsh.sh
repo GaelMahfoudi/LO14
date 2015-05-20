@@ -47,6 +47,19 @@ function host {
 
 }
 
+function logIn {
+
+    d=$(date)
+
+    echo -e "
+################# New connection #################
+user : $1      host : $2         
+date : $d
+##################################################
+" >> logIn
+
+}
+
 
 function handleCmd {
 	
