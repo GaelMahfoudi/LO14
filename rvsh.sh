@@ -51,7 +51,7 @@ function host {
 }
 
 
-function handleMsg {
+function handleCmd {
 	
 	tmp=($1)
     
@@ -174,7 +174,7 @@ then
 	while [ ! "$cmd" = "exit" ]
 	do
 		read -p "$user@$machine > " cmd
-		handleMsg "$cmd" $connectMode
+		handleCmd "$cmd" $connectMode
 	done
 
 fi
@@ -186,7 +186,7 @@ then
 	while [ ! "$cmd" = "exit" ]
 	do
 		read -p "rvsh > " cmd
-		handleMsg "$cmd" $connectMode
+		handleCmd "$cmd" $connectMode
 	done
 
 fi
