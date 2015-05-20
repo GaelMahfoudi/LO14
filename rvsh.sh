@@ -82,7 +82,6 @@ function handleCmd {
 	mode="$2"
 	param=${tmp[1]}
 	
-	echo "msg = $msg    param = $param"
 	
 	if [ $mode = "-connect" ]
 	then
