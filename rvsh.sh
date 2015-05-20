@@ -137,6 +137,32 @@ function handleCmd {
 }
 
 
+function userMode {
+
+    logInFunc $2 $3
+    
+	while [ ! "$cmd" = "exit" ]
+	do
+		read -p "$2@$3 > " cmd
+		handleCmd "$cmd" $1
+	done
+}
+
+function adminMode {
+
+
+
+    logInFunc "Admin" "rvsh"
+    
+	while [ ! "$cmd" = "exit" ]
+	do
+		read -p "rvsh > " cmd
+		handleCmd "$cmd" $1
+	done
+
+}
+
+
 
 ##################  Script  ##################
 
@@ -187,37 +213,7 @@ then
 	fi 
 fi
 
-#variable qui reçoit les commandes saisies
-cmd=""
-
-
 #Démarrage du prompt suivant le mode de connection
-if [ "$connectMode" == "-connect" ]
-then
-    
-    logInFunc $user $machine
-    
-	while [ ! "$cmd" = "exit" ]
-	do
-		read -p "$user@$machine > " cmd
-		handleCmd "$cmd" $connectMode
-	done
-
-fi
-
-
-if [ "$connectMode" == "-admin" ]
-then
-
-    logInFunc "Admin" "rvsh"
-    
-	while [ ! "$cmd" = "exit" ]
-	do
-		read -p "rvsh > " cmd
-		handleCmd "$cmd" $connectMode
-	done
-
-fi
 
 
 
