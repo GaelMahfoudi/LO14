@@ -67,6 +67,12 @@ date : $D
 
 }
 
+function whoIsConnected {
+
+    d=$(date +%F)
+    
+    cat $d/logIn
+}
 
 function handleCmd {
 	
@@ -84,7 +90,7 @@ function handleCmd {
 	
 	        #Gestion de la sortie
 	        "exit" ) clear;
-		    exit;;
+	        exit;;
 	        "e" ) clear;
 		    exit;;
 
@@ -92,7 +98,9 @@ function handleCmd {
 	        "clear" ) clear;;
 	        "c" ) clear;;
 	        "cl" ) clear;;
-
+	        
+	        #commande who
+	        "who" ) whoIsConnected;;
 
 	        "?" ) commandeList;;
 
