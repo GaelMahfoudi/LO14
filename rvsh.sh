@@ -43,10 +43,7 @@ clear : efface le contenu de l'écran (Possibilité de taper 'c')
 
 function host {
 
-    if [ ! -d /home/.rvsh/$1 ]
-    then
-        sudo mkdir /home/.rvsh/$1
-    fi
+    echo "En cours"
 
 }
 
@@ -121,7 +118,7 @@ function handleCmd {
 
 if [ ! -d /home/.rvsh ]
 then
-	sudo mkdir -p /home/.rvsh
+	echo "En cours"
 fi
 
 
