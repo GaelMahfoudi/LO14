@@ -21,7 +21,8 @@ function usage
     echo "  -h, --help       show this help message and quit"
     echo "  -a, --admin      log in the virtual machine as administrator"
     echo "  -c, --connect    log in the virtual machine as simple user"
-    echo "                   you must specify the hostname and the username"
+    echo "                   you must specify the hostname and the username."
+    echo "                   (you can connect as a guest, use guest for both username and hostname)"
     echo ""
     
     exit 1
@@ -119,11 +120,10 @@ function logInFunc {
 	    mkdir /home/rvsh/log/$d
     fi
     
-    echo -e "
-################# New connection #################
-user : $1      host : $2         
-date : $D
-##################################################
+    echo -e "Connection:    
+           User: $1
+           Host: $2
+           Date: $D      
 " >> /home/rvsh/log/$d/logIn
 
 }
@@ -207,27 +207,22 @@ function handleCmd {
 
 
 function userMode {
-    
-    
-    
-    if [ ! -d /home/rvsh/user/$2 ]
-    then
-        echo "Uknown user"
-        exit
-    fi
-    
-    if [ ! -d /home/rvsh/host/$3 ]
-    then
-        echo "Uknown host"
-        exit
-    fi
-    
 
-    logInFunc $2 $3
+    userName=$2
+    hostName=$3
+    
+    if [ "$userName" = "guest" -a "$hostName" = "guest" ]
+    then
+        echo -e "${Blue}You are connected as guest user.$NC"
+        hostName="guest-host"
+        userName="guest"
+    fi
+
+    logInFunc $userName $hostName
     
 	while [ ! "$cmd" = "exit" ]
 	do
-	    echo -e -n "${Orange}$2${Red}@${Orange}$3 > ${Green}"
+	    echo -e -n "${Orange}$userName${Red}@${Orange}$hostName > ${Green}"
 		read cmd
 		echo -e -n "$NC"
 		handleCmd "$cmd" $1
@@ -265,7 +260,7 @@ eval set -- $ARGS
     
     
 if [ $# -eq 1 ]
-then
+then 
     usage
 fi
     
