@@ -60,19 +60,14 @@ clear : efface le contenu de l'écran (Possibilité de taper 'c')
 "
 }
 
+
+#################HOST FUNCTION#####################
 function hostList {
     
     echo -e -n "$Blue"
     echo -e -n $(ls /home/rvsh/host)
     echo -e "$NC"
 
-}
-
-function userList {
-
-    echo -e -n "$Blue"
-    echo -e -n $(ls /home/rvsh/user)
-    echo -e "$NC"
 }
 
 function addHost {
@@ -112,6 +107,16 @@ function host {
         "h" ) echo "aide";;
     esac
     
+}
+###################################################
+
+
+##################USER FUNCTION####################
+function userList {
+
+    echo -e -n "$Blue"
+    echo -e -n $(ls /home/rvsh/user)
+    echo -e "$NC"
 }
 
 function addUser {
@@ -156,6 +161,8 @@ function user {
         "h" ) echo "aide";;
     esac
 }
+###################################################
+
 
 function logInFunc {
 
