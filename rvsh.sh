@@ -61,30 +61,79 @@ clear : efface le contenu de l'écran (Possibilité de taper 'c')
 }
 
 function hostList {
-
-    ls /home/rvsh/host
+    
+    echo -e -n "$Blue"
+    echo -e -n $(ls /home/rvsh/host)
+    echo -e "$NC"
 
 }
 
 function userList {
 
-    ls /home/rvsh/user
+    echo -e -n "$Blue"
+    echo -e -n $(ls /home/rvsh/user)
+    echo -e "$NC"
+}
 
+function addHost {
+    if [ ! -d /home/rvsh/host/$1 ]
+    then 
+        mkdir /home/rvsh/host/$1
+        echo -e "${Blue}The host $1 has been added.$NC"
+    else
+        echo -e "${Blue}The host $1 already exist.$NC"
+    fi
+}
+
+function delHost {
+    if [ -d /home/rvsh/host/$1 ]
+    then 
+        rmdir /home/rvsh/host/$1
+        echo -e "${Blue}The host $1 has been removed.$NC"
+    else
+        echo -e "${Blue}The host $1 doesn't exist.$NC"
+    fi
 }
 
 function host {
-
+    
     if [ ! -d /home/rvsh/host ]
     then 
         mkdir /home/rvsh/host
     fi
+    
+    local OPTIND
+    getopts "a:r:lh" OPTION
+    
+    case "$OPTION" in
+        "a" ) addHost $OPTARG;;
+        "r" ) delHost $OPTARG;;
+        "l" ) hostList;;
+        "h" ) echo "aide";;
+    esac
+    
+}
 
+function addUser {
 
-    if [ ! -d /home/rvsh/host/$1 ]
+    if [ ! -d /home/rvsh/user/$1 ]
     then 
-        mkdir /home/rvsh/host/$1
+        mkdir /home/rvsh/user/$1
+        echo -e "${Blue}The user $1 has been added.$NC"
     else
-        rmdir /home/rvsh/host/$1
+        echo -e "${Blue}The user $1 already exist.$NC"
+    fi
+}
+
+function delUser {
+
+    
+    if [ -d /home/rvsh/user/$1 ]
+    then 
+        rmdir /home/rvsh/user/$1
+        echo -e "${Blue}The user $1 has been removed.$NC"
+    else
+        echo -e "${Blue}The user $1 doesn't exist.$NC"
     fi
 
 }
@@ -95,13 +144,17 @@ function user {
     then 
         mkdir /home/rvsh/user
     fi
-
-    if [ ! -d /home/rvsh/user/$1 ]
-    then 
-        mkdir /home/rvsh/user/$1
-    else
-        rmdir /home/rvsh/user/$1
-    fi
+    
+    local OPTIND
+    
+    getopts "a:r:lh" OPTION
+    
+    case "$OPTION" in
+        "a" ) addUser $OPTARG;;
+        "r" ) delUser $OPTARG;;
+        "l" ) userList;;
+        "h" ) echo "aide";;
+    esac
 }
 
 function logInFunc {
@@ -138,10 +191,10 @@ function whoIsConnected {
 function handleCmd {
 	
 	tmp=($1)
+    mode="$2"
     
-	msg=${tmp[0]}
-	mode="$2"
-	param=${tmp[1]}
+	msg=${tmp[0]} #On récupère le premier mot de tmp qui est la commande
+	param=${1:${#msg}} #On récupère les mots suivants qui sont les paramètres
 	
 	
 	if [ $mode = "-connect" ]
@@ -188,7 +241,6 @@ function handleCmd {
 	        
 	        #Gestion des users
 	        "user" ) user $param;;
-	        "userlist" ) userList;;
 	        
 	        #commande who
 	        "who" ) whoIsConnected;;
