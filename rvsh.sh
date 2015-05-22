@@ -12,35 +12,29 @@
 # Reset
 NC='\e[0m'       # Text Reset
 
-# Voici toute les couleurs en normal et en gras
-# attendre avant de les ajouter
-# car modification de certains morceaux de code necessaires
 
-# # Regular Colors
-# BLACK='\e[0;30m'        # Black
-# RED='\e[0;31m'          # Red
-# GREEN='\e[0;32m'        # Green
-# YELLOW='\e[0;33m'       # Yellow
-# BLUE='\e[0;34m'         # Blue
-# PURPLE='\e[0;35m'       # Purple
-# CYAN='\e[0;36m'         # Cyan
-# WHITE='\e[0;37m'        # White
+# Regular Colors
+BLACK='\e[0;30m'        # Black
+RED='\e[0;31m'          # Red
+GREEN='\e[0;32m'        # Green
+YELLOW='\e[0;33m'       # Yellow
+BLUE='\e[0;34m'         # Blue
+PURPLE='\e[0;35m'       # Purple
+CYAN='\e[0;36m'         # Cyan
+WHITE='\e[0;37m'        # White
 
-# # Bold
-# BBLACK='\e[1;30m'       # Black
-# BRED='\e[1;31m'         # Red
-# BGREEN='\e[1;32m'       # Green
-# BYELLOW='\e[1;33m'      # Yellow
-# BBLUE='\e[1;34m'        # Blue
-# BPURPLE='\e[1;35m'      # Purple
-# BCYAN='\e[1;36m'        # Cyan
-# BWHISTE='\e[1;37m'      # White
+# Bold
+BBLACK='\e[1;30m'       # Black
+BRED='\e[1;31m'         # Red
+BGREEN='\e[1;32m'       # Green
+BYELLOW='\e[1;33m'      # Yellow
+BBLUE='\e[1;34m'        # Blue
+BPURPLE='\e[1;35m'      # Purple
+BCYAN='\e[1;36m'        # Cyan
+BWHIHTE='\e[1;37m'      # White
 
 
-ORANGE='\033[1;33m'
-GREEN='\033[1;32m'
-BLUE='\033[1;34m'
-RED='\033[1;31m'
+
 
 
 ####################################################
@@ -66,12 +60,44 @@ function usage {
 
 
 #
+# DOCUMENTATION help_cmd
+# les cmd sont lues a partie des fichier .admincmd et .usercmd
+#
+
+function help_cmd {
+
+    local mode="$1"
+    local file=""
+
+    if [ "$mode" = "admin" ]
+    then
+
+        file=$PWD/.admincmd
+
+    else
+
+        file=$PWD/.usercmd
+
+    fi
+    
+    # on lit le fichier d'aide associé au mode
+    echo -en "$(head -2 $file)\n\n"
+    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
+
+
+}
+
+
+
+#
 # DOCUMENTATION write_logs
+# le mode signifie si c'est une deconnexion ou un connexion
 #
 function write_logs {
 
     local username="$1"
     local hostname="$2"
+    local mode="$3"
 
     local rep_log=$(date +%F) # nom du dossier de log
     local prompt_log=$(date | awk '{print $1, $2, $3, $4, $5}' | sed 's/,/ --/')
@@ -93,6 +119,10 @@ function write_logs {
 }
 
 
+
+#
+# DOCUMENTATION handle_admin_cmd
+#
 function handle_admin_cmd {
 
     local cmd=""    # commande entree par l'utilisateur
@@ -104,131 +134,125 @@ function handle_admin_cmd {
     
     while [ "$cmd" != "quit" ]
     do
-        read -p "$admin_prompt " cmd
-
+        echo -en "$admin_prompt "
+        read cmd
         
-   done
+        # lecture de la commande entree
+        case "$cmd" in
 
+            'quit') 
+                exit
+                ;;
+
+            'clear')
+                clear
+                ;;
+
+            'afinger')
+                echo "[*] commande en dev..."
+                ;;
+
+            'host')
+                echo "[*] commande en dev..."
+                ;;
+            'user')
+                echo "[*] commande en dev..."
+                ;;
+            
+            '')
+                continue
+                ;;
+
+            '?') 
+                help_cmd "admin"
+                ;;
+
+            *) 
+                echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
+                ;;
+        esac
+   done
 }
 
-# #Affiche la liste des commandes disponnibles et une petite aide
-# function commandeList {
-#     echo -e "
-# exit : quitte rvsh  (Possibilité de taper 'e')
-# clear : efface le contenu de l'écran (Possibilité de taper 'c')
-# ? : affiche la liste des commandes disponnibles. La syntaxe [nom_commande]? affiche l'aide pour cette commande.
-# "
-# }
+
+#
+# DOCUMENTATION handle_admin_cmd
+#
+function handle_user_cmd {
 
 
-# function handleCmd {
-	
-# 	tmp=($1)
-#     mode="$2"
-    
-# 	msg=${tmp[0]} #On récupère le premier mot de tmp qui est la commande
-# 	param=${1:${#msg}} #On récupère les mots suivants qui sont les paramètres
-	
-	
-# 	if [ $mode = "-connect" ]
-# 	then
-# 	    case "$msg" in
-	
-# 	        #Gestion de la sortie
-# 	        "exit" ) clear;
-# 	        exit;;
-# 	        "e" ) clear;
-# 		    exit;;
+    local username="$1"
+    local hostname="$2"
+    local cmd=""    # commande entree par l'utilisateur
+    local user_prompt="${GREEN}${username}@${hostname} >${NC}"
 
-# 	        #Effacement de l'écran
-# 	        "clear" ) clear;;
-# 	        "c" ) clear;;
-# 	        "cl" ) clear;;
-	        
-# 	        #commande who
-# 	        "who" ) whoIsConnected;;
-
-# 	        "?" ) commandeList;;
-
-# 	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
-# 	    esac
-	    
-# 	else
-	
-# 	    case "$msg" in
-	
-# 	        #Gestion de la sortie
-# 	        "exit" ) clear;
-# 		    exit;;
-# 	        "e" ) clear;
-# 		    exit;;
-
-# 	        #Effacement de l'écran
-# 	        "clear" ) clear;;
-# 	        "c" ) clear;;
-# 	        "cl" ) clear;;
-	        
-# 	        #Gestion des host
-# 	        "host" ) host $param;;
-# 	        "hostlist" ) hostList;;
-	        
-# 	        #Gestion des users
-# 	        "user" ) user $param;;
-	        
-# 	        #commande who
-# 	        "who" ) whoIsConnected;;
-
-
-# 	        "?" ) commandeList;;
-
-# 	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
-# 	    esac
-	    
-#     fi
+    write_logs "$username" "$hostname"
     
     
+    while [ "$cmd" != "quit" ]
+    do
+        echo -en "$user_prompt "
+        read cmd
+        
+        # lecture de la commande entree
+        case "$cmd" in
 
-# }
+            'quit') 
+                exit
+                ;;
+
+            'clear')
+                clear
+                ;;
+
+            'who')
+                echo "[*] commande en dev..."
+                ;;
+
+            'rusers')
+                echo "[*] commande en dev..."
+                ;;
+            'rhost')
+                echo "[*] commande en dev..."
+                ;;
+
+            'connect')
+                echo "[*] commande en dev..."
+                ;;
+
+            'su')
+                echo "[*] commande en dev..."
+                ;;
+
+            'passwd')
+                echo "[*] commande en dev..."
+                ;;
+
+            'finger')
+                echo "[*] commande en dev..."
+                ;;
+
+            'write')
+                echo "[*] commande en dev..."
+                ;;
+
+            '')
+                continue
+                ;;
+
+            '?') 
+                help_cmd "user"
+                ;;
+
+            *) 
+                echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
+                ;;
+        esac
+   done
+}
 
 
 
-# function userMode {
-
-#     userName=$2
-#     hostName=$3
-    
-#     if [ "$userName" = "guest" -a "$hostName" = "guest" ]
-#     then
-#         echo -e "${White}You are connected as guest user.$NC"
-#         hostName="guest-host"
-#         userName="guest"
-#     fi
-
-#     write_logs $userName $hostName
-    
-# 	while [ ! "$cmd" = "exit" ]
-# 	do
-# 	    echo -e -n "${Red}$userName${Orange}@${Red}$hostName > ${White}"
-# 		read cmd
-# 		echo -e -n "$NC"
-# 		handleCmd "$cmd" $1
-# 	done
-# }
-
-# function admin_mode {
-
-
-#     write_logs "Admin" "rvsh"
-    
-# 	while [ ! "$cmd" = "exit" ]
-# 	do
-# 	    echo -e -n "${Red}rvsh > $White"
-# 		read  cmd 
-# 		echo -e -n "$NC"
-# 		handleCmd "$cmd" $1
-# 	done
-
-# }
 
 
 
@@ -270,7 +294,8 @@ while true; do
         -a | --admin)
         shift
         admin_flag="on"
-        #admin_mode "-admin" # ?????
+        
+        break
         ;;
             
         -c | --connect)
@@ -280,7 +305,8 @@ while true; do
         shift 2
         username="$1"
 
-        #userMode "-connect" $USERNAME $HOSTNAME    
+        
+        break
         ;;
             
         --)
@@ -298,7 +324,19 @@ done
 #
 if [ "$admin_flag" = "on" ]
 then
-    admin_mode
+    
+    #+ gerer le mdp de l'admin
+    handle_admin_cmd
+
+elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
+then
+
+    handle_user_cmd $username $hostname
+
+else
+
+    exit
+
 fi
 
 ####################################################
