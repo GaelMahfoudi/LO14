@@ -43,7 +43,11 @@ BLUE='\033[1;34m'
 RED='\033[1;31m'
 
 
-################## function ##################
+####################################################
+#
+# FUNCTIONS
+#
+####################################################
 
 function usage {
 
@@ -61,177 +65,176 @@ function usage {
 }
 
 
+#
+# DOCUMENTATION write_logs
+#
+function write_logs {
 
-function h {
+    local username="$1"
+    local hostname="$2"
 
-	echo -e "
-Utilisation de rvsh : 
-rvsh [mode de connection] [utilisateur] [machine]
-Mode de connection :
-	-connect accéder aux machines en tant qu'utilisateur.
-	-admin accéder à l'interface administrateur
-
-"
-}
-
-#Affiche la liste des commandes disponnibles et une petite aide
-function commandeList {
-	echo -e "
-exit : quitte rvsh  (Possibilité de taper 'e')
-clear : efface le contenu de l'écran (Possibilité de taper 'c')
-? : affiche la liste des commandes disponnibles. La syntaxe [nom_commande]? affiche l'aide pour cette commande.
-"
-}
-
-
-function logInFunc {
-
+    local rep_log=$(date +%F) # nom du dossier de log
+    local prompt_log=$(date | awk '{print $1, $2, $3, $4, $5}' | sed 's/,/ --/')
     
+
+    # si le dossier de log n'existe pas, on le cree
     if [ ! -d /home/rvsh/log ]
     then
 	    mkdir /home/rvsh/log
     fi
     
-    d=$(date +%F)
-    D=$(date)
-    
-    if [ ! -d /home/rvsh/log/$d ]
+    # on cree le dossier de log du jour si il n'existe pas
+    if [ ! -d /home/rvsh/log/$rep_log ]
     then
-	    mkdir /home/rvsh/log/$d
+	    mkdir /home/rvsh/log/$rep_log
     fi
     
-    echo -e "Connection:    
-           User: $1
-           Host: $2
-           Date: $D      
-" >> /home/rvsh/log/$d/logIn
+    echo -e "${prompt_log} >  $username connected in $hostname" >> /home/rvsh/log/$rep_log/syslogs
+}
+
+
+function handle_admin_cmd {
+
+    local cmd=""    # commande entree par l'utilisateur
+    local admin_prompt="${RED}rvsh >${NC}"
+
+    # on ecrit les logs
+    write_logs "admin" "rvsh"
+    
+    
+    while [ "$cmd" != "quit" ]
+    do
+        read -p "$admin_prompt " cmd
+
+        
+   done
 
 }
 
-function whoIsConnected {
+# #Affiche la liste des commandes disponnibles et une petite aide
+# function commandeList {
+#     echo -e "
+# exit : quitte rvsh  (Possibilité de taper 'e')
+# clear : efface le contenu de l'écran (Possibilité de taper 'c')
+# ? : affiche la liste des commandes disponnibles. La syntaxe [nom_commande]? affiche l'aide pour cette commande.
+# "
+# }
 
-    d=$(date +%F)
+
+# function handleCmd {
+	
+# 	tmp=($1)
+#     mode="$2"
     
-    echo -e "$White$(cat /home/rvsh/log/$d/logIn)$NC"
-}
+# 	msg=${tmp[0]} #On récupère le premier mot de tmp qui est la commande
+# 	param=${1:${#msg}} #On récupère les mots suivants qui sont les paramètres
+	
+	
+# 	if [ $mode = "-connect" ]
+# 	then
+# 	    case "$msg" in
+	
+# 	        #Gestion de la sortie
+# 	        "exit" ) clear;
+# 	        exit;;
+# 	        "e" ) clear;
+# 		    exit;;
 
-function handleCmd {
-	
-	tmp=($1)
-    mode="$2"
-    
-	msg=${tmp[0]} #On récupère le premier mot de tmp qui est la commande
-	param=${1:${#msg}} #On récupère les mots suivants qui sont les paramètres
-	
-	
-	if [ $mode = "-connect" ]
-	then
-	    case "$msg" in
-	
-	        #Gestion de la sortie
-	        "exit" ) clear;
-	        exit;;
-	        "e" ) clear;
-		    exit;;
-
-	        #Effacement de l'écran
-	        "clear" ) clear;;
-	        "c" ) clear;;
-	        "cl" ) clear;;
+# 	        #Effacement de l'écran
+# 	        "clear" ) clear;;
+# 	        "c" ) clear;;
+# 	        "cl" ) clear;;
 	        
-	        #commande who
-	        "who" ) whoIsConnected;;
+# 	        #commande who
+# 	        "who" ) whoIsConnected;;
 
-	        "?" ) commandeList;;
+# 	        "?" ) commandeList;;
 
-	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
-	    esac
+# 	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
+# 	    esac
 	    
-	else
+# 	else
 	
-	    case "$msg" in
+# 	    case "$msg" in
 	
-	        #Gestion de la sortie
-	        "exit" ) clear;
-		    exit;;
-	        "e" ) clear;
-		    exit;;
+# 	        #Gestion de la sortie
+# 	        "exit" ) clear;
+# 		    exit;;
+# 	        "e" ) clear;
+# 		    exit;;
 
-	        #Effacement de l'écran
-	        "clear" ) clear;;
-	        "c" ) clear;;
-	        "cl" ) clear;;
+# 	        #Effacement de l'écran
+# 	        "clear" ) clear;;
+# 	        "c" ) clear;;
+# 	        "cl" ) clear;;
 	        
-	        #Gestion des host
-	        "host" ) host $param;;
-	        "hostlist" ) hostList;;
+# 	        #Gestion des host
+# 	        "host" ) host $param;;
+# 	        "hostlist" ) hostList;;
 	        
-	        #Gestion des users
-	        "user" ) user $param;;
+# 	        #Gestion des users
+# 	        "user" ) user $param;;
 	        
-	        #commande who
-	        "who" ) whoIsConnected;;
+# 	        #commande who
+# 	        "who" ) whoIsConnected;;
 
 
-	        "?" ) commandeList;;
+# 	        "?" ) commandeList;;
 
-	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
-	    esac
+# 	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
+# 	    esac
 	    
-    fi
+#     fi
     
     
 
-}
+# }
 
 
 
-function userMode {
+# function userMode {
 
-    userName=$2
-    hostName=$3
+#     userName=$2
+#     hostName=$3
     
-    if [ "$userName" = "guest" -a "$hostName" = "guest" ]
-    then
-        echo -e "${White}You are connected as guest user.$NC"
-        hostName="guest-host"
-        userName="guest"
-    fi
+#     if [ "$userName" = "guest" -a "$hostName" = "guest" ]
+#     then
+#         echo -e "${White}You are connected as guest user.$NC"
+#         hostName="guest-host"
+#         userName="guest"
+#     fi
 
-    logInFunc $userName $hostName
+#     write_logs $userName $hostName
     
-	while [ ! "$cmd" = "exit" ]
-	do
-	    echo -e -n "${Red}$userName${Orange}@${Red}$hostName > ${White}"
-		read cmd
-		echo -e -n "$NC"
-		handleCmd "$cmd" $1
-	done
-}
+# 	while [ ! "$cmd" = "exit" ]
+# 	do
+# 	    echo -e -n "${Red}$userName${Orange}@${Red}$hostName > ${White}"
+# 		read cmd
+# 		echo -e -n "$NC"
+# 		handleCmd "$cmd" $1
+# 	done
+# }
 
-function adminMode {
+# function admin_mode {
 
 
-
-    logInFunc "Admin" "rvsh"
+#     write_logs "Admin" "rvsh"
     
-	while [ ! "$cmd" = "exit" ]
-	do
-	    echo -e -n "${Red}rvsh > $White"
-		read  cmd 
-		echo -e -n "$NC"
-		handleCmd "$cmd" $1
-	done
+# 	while [ ! "$cmd" = "exit" ]
+# 	do
+# 	    echo -e -n "${Red}rvsh > $White"
+# 		read  cmd 
+# 		echo -e -n "$NC"
+# 		handleCmd "$cmd" $1
+# 	done
 
-}
+# }
 
 
 
 ####################################################
 #
-#
-# Script Begining
-#
+# SCRIPT BEGINING
 #
 ####################################################
 
@@ -241,8 +244,8 @@ ARGS=$(getopt -o hac: -l "help,admin,connect:" -n "rvsh.sh" -- "$@");
 eval set -- $ARGS
     
 # variables
-admin_mode=""
-users_mode=""
+admin_flag=""
+user_flag=""
 hostname=""
 username=""
 
@@ -253,11 +256,6 @@ then
     usage
 fi
 
-############### GAEL ####################
-# je vais retoucher quelques trucs dans la 
-# partie ci-dessous...
-# par pitié ne touche a rien...
-########################################
 
 while true; do
     
@@ -271,15 +269,17 @@ while true; do
             
         -a | --admin)
         shift
-        admin_mode="true"
-        #adminMode "-admin" # ?????
+        admin_flag="on"
+        #admin_mode "-admin" # ?????
         ;;
             
         -c | --connect)
         shift
+        user_flag="on"
         hostname="$1"
         shift 2
         username="$1"
+
         #userMode "-connect" $USERNAME $HOSTNAME    
         ;;
             
@@ -287,12 +287,22 @@ while true; do
         shift;
         break;
         ;;
+
     esac
+
 done
 
 
+# si le mode administrateur est actif 
+# il prime sur le mode utilisateur 
+#
+if [ "$admin_flag" = "on" ]
+then
+    admin_mode
+fi
 
-
-
-
-
+####################################################
+#
+# SCRIPT END
+#
+####################################################
