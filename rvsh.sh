@@ -9,6 +9,7 @@ Orange='\033[1;33m'
 Green='\033[1;32m'
 Blue='\033[1;34m'
 Red='\033[1;31m'
+White='\033[37m'
 NC='\033[0m'
 
 ################## function ##################
@@ -64,7 +65,7 @@ clear : efface le contenu de l'écran (Possibilité de taper 'c')
 #################HOST FUNCTION#####################
 function hostList {
     
-    echo -e -n "$Blue"
+    echo -e -n "$White"
     echo -e -n $(ls /home/rvsh/host)
     echo -e "$NC"
 
@@ -74,9 +75,9 @@ function addHost {
     if [ ! -d /home/rvsh/host/$1 ]
     then 
         mkdir /home/rvsh/host/$1
-        echo -e "${Blue}The host $1 has been added.$NC"
+        echo -e "${White}The host $1 has been added.$NC"
     else
-        echo -e "${Blue}The host $1 already exist.$NC"
+        echo -e "${White}The host $1 already exist.$NC"
     fi
 }
 
@@ -84,9 +85,9 @@ function delHost {
     if [ -d /home/rvsh/host/$1 ]
     then 
         rmdir /home/rvsh/host/$1
-        echo -e "${Blue}The host $1 has been removed.$NC"
+        echo -e "${White}The host $1 has been removed.$NC"
     else
-        echo -e "${Blue}The host $1 doesn't exist.$NC"
+        echo -e "${White}The host $1 doesn't exist.$NC"
     fi
 }
 
@@ -114,7 +115,7 @@ function host {
 ##################USER FUNCTION####################
 function userList {
 
-    echo -e -n "$Blue"
+    echo -e -n "$White"
     echo -e -n $(ls /home/rvsh/user)
     echo -e "$NC"
 }
@@ -124,9 +125,9 @@ function addUser {
     if [ ! -d /home/rvsh/user/$1 ]
     then 
         mkdir /home/rvsh/user/$1
-        echo -e "${Blue}The user $1 has been added.$NC"
+        echo -e "${White}The user $1 has been added.$NC"
     else
-        echo -e "${Blue}The user $1 already exist.$NC"
+        echo -e "${White}The user $1 already exist.$NC"
     fi
 }
 
@@ -136,9 +137,9 @@ function delUser {
     if [ -d /home/rvsh/user/$1 ]
     then 
         rmdir /home/rvsh/user/$1
-        echo -e "${Blue}The user $1 has been removed.$NC"
+        echo -e "${White}The user $1 has been removed.$NC"
     else
-        echo -e "${Blue}The user $1 doesn't exist.$NC"
+        echo -e "${White}The user $1 doesn't exist.$NC"
     fi
 
 }
@@ -152,15 +153,19 @@ function user {
     
     local OPTIND
     
-    getopts "a:r:lh" OPTION
+    getopts "a:r:c:lh" OPTION
     
     case "$OPTION" in
         "a" ) addUser $OPTARG;;
         "r" ) delUser $OPTARG;;
+        "c" ) userConfig $OPTARG;;
         "l" ) userList;;
         "h" ) echo "aide";;
     esac
 }
+
+
+
 ###################################################
 
 
@@ -192,7 +197,7 @@ function whoIsConnected {
 
     d=$(date +%F)
     
-    echo -e "$Blue$(cat /home/rvsh/log/$d/logIn)$NC"
+    echo -e "$White$(cat /home/rvsh/log/$d/logIn)$NC"
 }
 
 function handleCmd {
@@ -224,7 +229,7 @@ function handleCmd {
 
 	        "?" ) commandeList;;
 
-	        * ) echo -e "${Blue}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
+	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
 	    esac
 	    
 	else
@@ -255,7 +260,7 @@ function handleCmd {
 
 	        "?" ) commandeList;;
 
-	        * ) echo -e "${Blue}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
+	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
 	    esac
 	    
     fi
@@ -264,6 +269,22 @@ function handleCmd {
 
 }
 
+function userConfig {
+
+    
+    if [ ! -d /home/rvsh/user/$1 ]
+    then
+        echo "The user doesn't exist"
+    else    
+        userCmd=""
+        while [ ! \( "$userCmd" = "exit" -o "$userCmd" = "e" \) ]
+	    do
+	        echo -e -n "${Red}rvsh config-$1 > $White"
+		    read  userCmd 
+		    echo -e -n "$NC"
+	    done        
+    fi
+}
 
 function userMode {
 
@@ -272,7 +293,7 @@ function userMode {
     
     if [ "$userName" = "guest" -a "$hostName" = "guest" ]
     then
-        echo -e "${Blue}You are connected as guest user.$NC"
+        echo -e "${White}You are connected as guest user.$NC"
         hostName="guest-host"
         userName="guest"
     fi
@@ -281,7 +302,7 @@ function userMode {
     
 	while [ ! "$cmd" = "exit" ]
 	do
-	    echo -e -n "${Orange}$userName${Red}@${Orange}$hostName > ${Green}"
+	    echo -e -n "${Red}$userName${Orange}@${Red}$hostName > ${White}"
 		read cmd
 		echo -e -n "$NC"
 		handleCmd "$cmd" $1
@@ -296,7 +317,7 @@ function adminMode {
     
 	while [ ! "$cmd" = "exit" ]
 	do
-	    echo -e -n "${Orange}rvsh > $Green"
+	    echo -e -n "${Red}rvsh > $White"
 		read  cmd 
 		echo -e -n "$NC"
 		handleCmd "$cmd" $1
