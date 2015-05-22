@@ -84,112 +84,6 @@ clear : efface le contenu de l'écran (Possibilité de taper 'c')
 }
 
 
-#################HOST FUNCTION#####################
-function hostList {
-    
-    echo -e -n "$White"
-    echo -e -n $(ls /home/rvsh/host)
-    echo -e "$NC"
-
-}
-
-function addHost {
-    if [ ! -d /home/rvsh/host/$1 ]
-    then 
-        mkdir /home/rvsh/host/$1
-        echo -e "${White}The host $1 has been added.$NC"
-    else
-        echo -e "${White}The host $1 already exist.$NC"
-    fi
-}
-
-function delHost {
-    if [ -d /home/rvsh/host/$1 ]
-    then 
-        rmdir /home/rvsh/host/$1
-        echo -e "${White}The host $1 has been removed.$NC"
-    else
-        echo -e "${White}The host $1 doesn't exist.$NC"
-    fi
-}
-
-function host {
-    
-    if [ ! -d /home/rvsh/host ]
-    then 
-        mkdir /home/rvsh/host
-    fi
-    
-    local OPTIND
-    getopts "a:r:lh" OPTION
-    
-    case "$OPTION" in
-        "a" ) addHost $OPTARG;;
-        "r" ) delHost $OPTARG;;
-        "l" ) hostList;;
-        "h" ) echo "aide";;
-    esac
-    
-}
-###################################################
-
-
-##################USER FUNCTION####################
-function userList {
-    echo -e -n "$White"
-    echo -e -n $(ls /home/rvsh/user)
-    echo -e "$NC"
-}
-
-function addUser {
-
-    if [ ! -d /home/rvsh/user/$1 ]
-    then 
-        mkdir /home/rvsh/user/$1
-        echo -e "${White}The user $1 has been added.$NC"
-    else
-        echo -e "${White}The user $1 already exist.$NC"
-    fi
-}
-
-function delUser {
-
-    
-    if [ -d /home/rvsh/user/$1 ]
-    then 
-        rmdir /home/rvsh/user/$1
-        echo -e "${White}The user $1 has been removed.$NC"
-    else
-        echo -e "${White}The user $1 doesn't exist.$NC"
-    fi
-
-}
-
-function user {
-
-    if [ ! -d /home/rvsh/user ]
-    then 
-        mkdir /home/rvsh/user
-    fi
-    
-    local OPTIND
-    
-    getopts "a:r:c:lh" OPTION
-    
-    case "$OPTION" in
-        "a" ) addUser $OPTARG;;
-        "r" ) delUser $OPTARG;;
-        "c" ) userConfig $OPTARG;;
-        "l" ) userList;;
-        "h" ) echo "aide";;
-    esac
-}
-
-
-
-###################################################
-
-
 function logInFunc {
 
     
@@ -290,22 +184,7 @@ function handleCmd {
 
 }
 
-function userConfig {
 
-    
-    if [ ! -d /home/rvsh/user/$1 ]
-    then
-        echo "The user doesn't exist"
-    else    
-        userCmd=""
-        while [ ! \( "$userCmd" = "exit" -o "$userCmd" = "e" \) ]
-	    do
-	        echo -e -n "${Red}rvsh config-$1 > $White"
-		    read  userCmd 
-		    echo -e -n "$NC"
-	    done        
-    fi
-}
 
 function userMode {
 
