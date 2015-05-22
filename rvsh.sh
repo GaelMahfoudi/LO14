@@ -1,21 +1,51 @@
 #!/bin/bash
-#
-#
-#
+#---------------------------------------------------
+# title         : rvsh.sh 
+# author        : G. Mahfoudi & S. JUHEL
+# version       : 0.1    
+# description   : ...
+# bash_version  : 4.3.X-release
+#---------------------------------------------------
 
-clear
 
-Orange='\033[1;33m'
-Green='\033[1;32m'
-Blue='\033[1;34m'
-Red='\033[1;31m'
-White='\033[37m'
-NC='\033[0m'
+
+# Reset
+NC='\e[0m'       # Text Reset
+
+# Voici toute les couleurs en normal et en gras
+# attendre avant de les ajouter
+# car modification de certains morceaux de code necessaires
+
+# # Regular Colors
+# BLACK='\e[0;30m'        # Black
+# RED='\e[0;31m'          # Red
+# GREEN='\e[0;32m'        # Green
+# YELLOW='\e[0;33m'       # Yellow
+# BLUE='\e[0;34m'         # Blue
+# PURPLE='\e[0;35m'       # Purple
+# CYAN='\e[0;36m'         # Cyan
+# WHITE='\e[0;37m'        # White
+
+# # Bold
+# BBLACK='\e[1;30m'       # Black
+# BRED='\e[1;31m'         # Red
+# BGREEN='\e[1;32m'       # Green
+# BYELLOW='\e[1;33m'      # Yellow
+# BBLUE='\e[1;34m'        # Blue
+# BPURPLE='\e[1;35m'      # Purple
+# BCYAN='\e[1;36m'        # Cyan
+# BWHISTE='\e[1;37m'      # White
+
+
+ORANGE='\033[1;33m'
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+RED='\033[1;31m'
+
 
 ################## function ##################
 
-function usage 
-{
+function usage {
 
     echo "Usage: $(basename $0) [--admin | --connect <hostname> <username>]"
     echo ""
@@ -29,14 +59,6 @@ function usage
     exit 1
 
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -114,7 +136,6 @@ function host {
 
 ##################USER FUNCTION####################
 function userList {
-
     echo -e -n "$White"
     echo -e -n $(ls /home/rvsh/user)
     echo -e "$NC"
@@ -327,56 +348,67 @@ function adminMode {
 
 
 
-##################  Script  ##################
+####################################################
+#
+#
+# Script Begining
+#
+#
+####################################################
 
 
-# GLOBAL VARIABLES
-USERNAME=""
-HOSTNAME=""
-
-
+# parse the command line
 ARGS=$(getopt -o hac: -l "help,admin,connect:" -n "rvsh.sh" -- "$@");
 eval set -- $ARGS
     
-    
+# variables
+admin_mode=""
+users_mode=""
+hostname=""
+username=""
+
+
+# not enough arguments
 if [ $# -eq 1 ]
 then 
     usage
 fi
-    
-    
+
+############### GAEL ####################
+# je vais retoucher quelques trucs dans la 
+# partie ci-dessous...
+# par pitié ne touche a rien...
+########################################
+
 while true; do
     
     case "$1" in
             
         -h | --help)
-        shift;
-        usage;
+        shift
+        usage
         ;;
             
             
         -a | --admin)
-            shift;
-            adminMode "-admin";
-        exit;
+        shift
+        admin_mode="true"
+        #adminMode "-admin" # ?????
         ;;
             
         -c | --connect)
-            shift;
-            HOSTNAME="$1";
-            shift; shift;
-            USERNAME="$1";
-            userMode "-connect" $USERNAME $HOSTNAME;     
-        exit;
+        shift
+        hostname="$1"
+        shift 2
+        username="$1"
+        #userMode "-connect" $USERNAME $HOSTNAME    
         ;;
             
         --)
         shift;
         break;
         ;;
-        
     esac
-        
 done
 
 
