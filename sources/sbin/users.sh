@@ -1,28 +1,10 @@
-function userConfig {
-
-    
-    if [ ! -d /home/rvsh/user/$1 ]
-    then
-        echo "The user doesn't exist"
-    else    
-        userCmd=""
-        while [ ! \( "$userCmd" = "exit" -o "$userCmd" = "e" \) ]
-	    do
-	        echo -e -n "${Red}rvsh config-$1 > $White"
-		    read  userCmd 
-		    echo -e -n "$NC"
-	    done        
-    fi
-}
-
-
-function userList {
+function user-list {
     echo -e -n "$White"
     echo -e -n $(ls /home/rvsh/user)
     echo -e "$NC"
 }
 
-function addUser {
+function add-user {
 
     if [ ! -d /home/rvsh/user/$1 ]
     then 
@@ -33,7 +15,7 @@ function addUser {
     fi
 }
 
-function delUser {
+function del-user {
 
     
     if [ -d /home/rvsh/user/$1 ]
@@ -58,10 +40,9 @@ function user {
     getopts "a:r:c:lh" OPTION
     
     case "$OPTION" in
-        "a" ) addUser $OPTARG;;
-        "r" ) delUser $OPTARG;;
-        "c" ) userConfig $OPTARG;;
-        "l" ) userList;;
+        "a" ) add-user $OPTARG;;
+        "r" ) del-user $OPTARG;;
+        "l" ) user-list;;
         "h" ) echo "aide";;
     esac
 }

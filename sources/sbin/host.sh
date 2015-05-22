@@ -1,4 +1,4 @@
-function hostList {
+function host-list {
     
     echo -e -n "$White"
     echo -e -n $(ls /home/rvsh/host)
@@ -6,7 +6,7 @@ function hostList {
 
 }
 
-function addHost {
+function add-host {
     if [ ! -d /home/rvsh/host/$1 ]
     then 
         mkdir /home/rvsh/host/$1
@@ -16,7 +16,7 @@ function addHost {
     fi
 }
 
-function delHost {
+function del-host {
     if [ -d /home/rvsh/host/$1 ]
     then 
         rmdir /home/rvsh/host/$1
@@ -37,9 +37,9 @@ function host {
     getopts "a:r:lh" OPTION
     
     case "$OPTION" in
-        "a" ) addHost $OPTARG;;
-        "r" ) delHost $OPTARG;;
-        "l" ) hostList;;
+        "a" ) add-host $OPTARG;;
+        "r" ) del-host $OPTARG;;
+        "l" ) host-list;;
         "h" ) echo "aide";;
     esac
     
