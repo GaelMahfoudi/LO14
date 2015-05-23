@@ -100,7 +100,7 @@ function write_logs {
     local mode="$3"
 
     local rep_log=$(date +%F) # nom du dossier de log
-    local prompt_log=$(date | awk '{print $1, $2, $3, $4, $5}' | sed 's/,/ --/')
+    local prompt_log=$(date | awk '{printf "%s %s %s %s %s",  substr($1,0, 4), $2, $3, $4, $5}' | sed 's/,/ --/')
     
 
     # si le dossier de log n'existe pas, on le cree
@@ -115,8 +115,13 @@ function write_logs {
 	    mkdir /home/rvsh/log/$rep_log
     fi
     
+    #if [ "$mode" = "log_conn" ]
+    #then
     echo -e "${prompt_log} >  $username connected in $hostname" >> /home/rvsh/log/$rep_log/syslogs
-}
+    #else
+    #echo -e "${prompt_log} >  $username disconnected from $hostname" >> /home/rvsh/log/$rep_log/syslogs
+    #fi
+}   
 
 
 
@@ -129,7 +134,7 @@ function handle_admin_cmd {
     local admin_prompt="${RED}rvsh >${NC}"
 
     # on ecrit les logs
-    write_logs "admin" "rvsh"
+    write_logs "admin" "rvsh" "log_conn"
     
     
     while [ "$cmd" != "quit" ]
@@ -303,8 +308,14 @@ while true; do
         user_flag="on"
         hostname="$1"
         shift 2
-        username="$1"
 
+        if [ -z "$1" ] 
+        then
+            echo "Vous devez preciser le nom d'utilisateur..."
+            exit
+        else
+            username="$1"
+        fi 
         
         break
         ;;
