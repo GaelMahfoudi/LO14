@@ -134,7 +134,7 @@ function handle_admin_cmd {
         # lecture de la commande entree
         case "$cmd" in
 
-            'quit') 
+            'quit' | 'q') 
                 
                 ;;
 
