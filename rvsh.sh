@@ -8,6 +8,7 @@
 #---------------------------------------------------
 
 
+source sources/sbin/host.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -129,7 +130,12 @@ function handle_admin_cmd {
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]
     do
         echo -en "$admin_prompt "
-        read cmd
+        read tmp
+        cmd=($tmp)
+        cmd=${cmd[0]}
+        param=${tmp:${#cmd}}
+        
+        
         
         # lecture de la commande entree
         case "$cmd" in
@@ -147,7 +153,7 @@ function handle_admin_cmd {
                 ;;
 
             'host')
-                echo "[*] commande en dev..."
+                host $param
                 ;;
             'user')
                 echo "[*] commande en dev..."

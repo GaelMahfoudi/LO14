@@ -27,7 +27,6 @@ function del-host {
 }
 
 function host {
-    
     if [ ! -d /home/rvsh/host ]
     then 
         mkdir /home/rvsh/host
@@ -42,5 +41,5 @@ function host {
         "l" ) host-list;;
         "h" ) echo "aide";;
     esac
-    
 }
+   
