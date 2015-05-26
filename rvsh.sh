@@ -126,7 +126,7 @@ function handle_admin_cmd {
     write_logs "admin" "rvsh" "connected"
     
     
-    while [ "$cmd" != "quit" ]
+    while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]
     do
         echo -en "$admin_prompt "
         read cmd
