@@ -84,7 +84,6 @@ function help_cmd {
     echo -en "$(head -2 $file)\n\n"
     echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
 
-
 }
 
 
@@ -97,30 +96,20 @@ function write_logs {
 
     local username="$1"
     local hostname="$2"
-    local mode="$3"
+    local message="$3"
 
     local rep_log=$(date +%F) # nom du dossier de log
     local prompt_log=$(date | awk '{printf "%s %s %s %s %s",  substr($1,0, 4), $2, $3, $4, $5}' | sed 's/,/ --/')
     
 
     # si le dossier de log n'existe pas, on le cree
-    if [ ! -d /home/rvsh/log ]
-    then
-	    mkdir /home/rvsh/log
-    fi
-    
-    # on cree le dossier de log du jour si il n'existe pas
     if [ ! -d /home/rvsh/log/$rep_log ]
     then
-	    mkdir /home/rvsh/log/$rep_log
+	    mkdir -p /home/rvsh/log/$rep_log
     fi
     
-    #if [ "$mode" = "log_conn" ]
-    #then
-    echo -e "${prompt_log} >  $username connected in $hostname" >> /home/rvsh/log/$rep_log/syslogs
-    #else
-    #echo -e "${prompt_log} >  $username disconnected from $hostname" >> /home/rvsh/log/$rep_log/syslogs
-    #fi
+    
+    echo -e "${prompt_log} >  $username @ $hostname: $message" >> /home/rvsh/log/$rep_log/syslogs
 }   
 
 
@@ -134,7 +123,7 @@ function handle_admin_cmd {
     local admin_prompt="${RED}rvsh >${NC}"
 
     # on ecrit les logs
-    write_logs "admin" "rvsh" "log_conn"
+    write_logs "admin" "rvsh" "connected"
     
     
     while [ "$cmd" != "quit" ]
@@ -146,7 +135,7 @@ function handle_admin_cmd {
         case "$cmd" in
 
             'quit') 
-                exit
+                
                 ;;
 
             'clear')
@@ -176,7 +165,11 @@ function handle_admin_cmd {
                 echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
                 ;;
         esac
+    
    done
+
+    write_logs "admin" "rvsh" "disconnected"
+
 }
 
 
@@ -191,7 +184,7 @@ function handle_user_cmd {
     local cmd=""    # commande entree par l'utilisateur
     local user_prompt="${GREEN}${username}@${hostname} >${NC}"
 
-    write_logs "$username" "$hostname"
+    write_logs "$username" "$hostname" "connected"
     
     
     while [ "$cmd" != "quit" ]
@@ -203,7 +196,7 @@ function handle_user_cmd {
         case "$cmd" in
 
             'quit') 
-                exit
+                
                 ;;
 
             'clear')
@@ -253,7 +246,10 @@ function handle_user_cmd {
                 echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
                 ;;
         esac
+
    done
+
+   write_logs "$username" "$hostname" "disconnected"
 }
 
 
@@ -336,8 +332,17 @@ done
 if [ "$admin_flag" = "on" ]
 then
     
-    #+ gerer le mdp de l'admin
-    handle_admin_cmd
+    md5_pass="6f55b656e660c72e2e38b8a68c598703"
+    read -p "[*] administrator password: " -s pass
+    
+    if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$md5_pass" ]
+    then
+        echo ""
+        handle_admin_cmd
+    else
+        echo -e  "\n[!] wrong password for administrator"
+        exit
+    fi
 
 elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
 then
