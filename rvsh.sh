@@ -12,38 +12,36 @@
 # Reset
 NC='\e[0m'       # Text Reset
 
-# Voici toute les couleurs en normal et en gras
-# attendre avant de les ajouter
-# car modification de certains morceaux de code necessaires
 
-# # Regular Colors
-# BLACK='\e[0;30m'        # Black
-# RED='\e[0;31m'          # Red
-# GREEN='\e[0;32m'        # Green
-# YELLOW='\e[0;33m'       # Yellow
-# BLUE='\e[0;34m'         # Blue
-# PURPLE='\e[0;35m'       # Purple
-# CYAN='\e[0;36m'         # Cyan
-# WHITE='\e[0;37m'        # White
+# Regular Colors
+BLACK='\e[0;30m'        # Black
+RED='\e[0;31m'          # Red
+GREEN='\e[0;32m'        # Green
+YELLOW='\e[0;33m'       # Yellow
+BLUE='\e[0;34m'         # Blue
+PURPLE='\e[0;35m'       # Purple
+CYAN='\e[0;36m'         # Cyan
+WHITE='\e[0;37m'        # White
 
-# # Bold
-# BBLACK='\e[1;30m'       # Black
-# BRED='\e[1;31m'         # Red
-# BGREEN='\e[1;32m'       # Green
-# BYELLOW='\e[1;33m'      # Yellow
-# BBLUE='\e[1;34m'        # Blue
-# BPURPLE='\e[1;35m'      # Purple
-# BCYAN='\e[1;36m'        # Cyan
-# BWHISTE='\e[1;37m'      # White
+# Bold
+BBLACK='\e[1;30m'       # Black
+BRED='\e[1;31m'         # Red
+BGREEN='\e[1;32m'       # Green
+BYELLOW='\e[1;33m'      # Yellow
+BBLUE='\e[1;34m'        # Blue
+BPURPLE='\e[1;35m'      # Purple
+BCYAN='\e[1;36m'        # Cyan
+BWHIHTE='\e[1;37m'      # White
 
 
-ORANGE='\033[1;33m'
-GREEN='\033[1;32m'
-BLUE='\033[1;34m'
-RED='\033[1;31m'
 
 
-################## function ##################
+
+####################################################
+#
+# FUNCTIONS
+#
+####################################################
 
 function usage {
 
@@ -61,177 +59,207 @@ function usage {
 }
 
 
+#
+# DOCUMENTATION help_cmd
+# les cmd sont lues a partie des fichier .admincmd et .usercmd
+#
 
-function h {
+function help_cmd {
 
-	echo -e "
-Utilisation de rvsh : 
-rvsh [mode de connection] [utilisateur] [machine]
-Mode de connection :
-	-connect accéder aux machines en tant qu'utilisateur.
-	-admin accéder à l'interface administrateur
+    local mode="$1"
+    local file=""
 
-"
-}
-
-#Affiche la liste des commandes disponnibles et une petite aide
-function commandeList {
-	echo -e "
-exit : quitte rvsh  (Possibilité de taper 'e')
-clear : efface le contenu de l'écran (Possibilité de taper 'c')
-? : affiche la liste des commandes disponnibles. La syntaxe [nom_commande]? affiche l'aide pour cette commande.
-"
-}
-
-
-function logInFunc {
-
-    
-    if [ ! -d /home/rvsh/log ]
+    if [ "$mode" = "admin" ]
     then
-	    mkdir /home/rvsh/log
+
+        file=$PWD/.admincmd
+
+    else
+
+        file=$PWD/.usercmd
+
     fi
     
-    d=$(date +%F)
-    D=$(date)
+    # on lit le fichier d'aide associé au mode
+    echo -en "$(head -2 $file)\n\n"
+    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
+
+}
+
+
+
+#
+# DOCUMENTATION write_logs
+# le mode signifie si c'est une deconnexion ou un connexion
+#
+function write_logs {
+
+    local username="$1"
+    local hostname="$2"
+    local message="$3"
+
+    local rep_log=$(date +%F) # nom du dossier de log
+    local prompt_log=$(date | awk '{printf "%s %s %s %s %s",  substr($1,0, 4), $2, $3, $4, $5}' | sed 's/,/ --/')
     
-    if [ ! -d /home/rvsh/log/$d ]
+
+    # si le dossier de log n'existe pas, on le cree
+    if [ ! -d /home/rvsh/log/$rep_log ]
     then
-	    mkdir /home/rvsh/log/$d
-    fi
-    
-    echo -e "Connection:    
-           User: $1
-           Host: $2
-           Date: $D      
-" >> /home/rvsh/log/$d/logIn
-
-}
-
-function whoIsConnected {
-
-    d=$(date +%F)
-    
-    echo -e "$White$(cat /home/rvsh/log/$d/logIn)$NC"
-}
-
-function handleCmd {
-	
-	tmp=($1)
-    mode="$2"
-    
-	msg=${tmp[0]} #On récupère le premier mot de tmp qui est la commande
-	param=${1:${#msg}} #On récupère les mots suivants qui sont les paramètres
-	
-	
-	if [ $mode = "-connect" ]
-	then
-	    case "$msg" in
-	
-	        #Gestion de la sortie
-	        "exit" ) clear;
-	        exit;;
-	        "e" ) clear;
-		    exit;;
-
-	        #Effacement de l'écran
-	        "clear" ) clear;;
-	        "c" ) clear;;
-	        "cl" ) clear;;
-	        
-	        #commande who
-	        "who" ) whoIsConnected;;
-
-	        "?" ) commandeList;;
-
-	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
-	    esac
-	    
-	else
-	
-	    case "$msg" in
-	
-	        #Gestion de la sortie
-	        "exit" ) clear;
-		    exit;;
-	        "e" ) clear;
-		    exit;;
-
-	        #Effacement de l'écran
-	        "clear" ) clear;;
-	        "c" ) clear;;
-	        "cl" ) clear;;
-	        
-	        #Gestion des host
-	        "host" ) host $param;;
-	        "hostlist" ) hostList;;
-	        
-	        #Gestion des users
-	        "user" ) user $param;;
-	        
-	        #commande who
-	        "who" ) whoIsConnected;;
-
-
-	        "?" ) commandeList;;
-
-	        * ) echo -e "${White}$msg : Commande non reconnue, '?' pour afficher les commandes disponnibles$NC";;
-	    esac
-	    
+	    mkdir -p /home/rvsh/log/$rep_log
     fi
     
     
+    echo -e "${prompt_log} >  $username @ $hostname: $message" >> /home/rvsh/log/$rep_log/syslogs
+}   
+
+
+
+#
+# DOCUMENTATION handle_admin_cmd
+#
+function handle_admin_cmd {
+
+    local cmd=""    # commande entree par l'utilisateur
+    local admin_prompt="${RED}rvsh >${NC}"
+
+    # on ecrit les logs
+    write_logs "admin" "rvsh" "connected"
+    
+    
+    while [ "$cmd" != "quit" ]
+    do
+        echo -en "$admin_prompt "
+        read cmd
+        
+        # lecture de la commande entree
+        case "$cmd" in
+
+            'quit') 
+                
+                ;;
+
+            'clear')
+                clear
+                ;;
+
+            'afinger')
+                echo "[*] commande en dev..."
+                ;;
+
+            'host')
+                echo "[*] commande en dev..."
+                ;;
+            'user')
+                echo "[*] commande en dev..."
+                ;;
+            
+            '')
+                continue
+                ;;
+
+            '?') 
+                help_cmd "admin"
+                ;;
+
+            *) 
+                echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
+                ;;
+        esac
+    
+   done
+
+    write_logs "admin" "rvsh" "disconnected"
 
 }
 
 
+#
+# DOCUMENTATION handle_admin_cmd
+#
+function handle_user_cmd {
 
-function userMode {
 
-    userName=$2
-    hostName=$3
+    local username="$1"
+    local hostname="$2"
+    local cmd=""    # commande entree par l'utilisateur
+    local user_prompt="${GREEN}${username}@${hostname} >${NC}"
+
+    write_logs "$username" "$hostname" "connected"
     
-    if [ "$userName" = "guest" -a "$hostName" = "guest" ]
-    then
-        echo -e "${White}You are connected as guest user.$NC"
-        hostName="guest-host"
-        userName="guest"
-    fi
-
-    logInFunc $userName $hostName
     
-	while [ ! "$cmd" = "exit" ]
-	do
-	    echo -e -n "${Red}$userName${Orange}@${Red}$hostName > ${White}"
-		read cmd
-		echo -e -n "$NC"
-		handleCmd "$cmd" $1
-	done
+    while [ "$cmd" != "quit" ]
+    do
+        echo -en "$user_prompt "
+        read cmd
+        
+        # lecture de la commande entree
+        case "$cmd" in
+
+            'quit') 
+                
+                ;;
+
+            'clear')
+                clear
+                ;;
+
+            'who')
+                echo "[*] commande en dev..."
+                ;;
+
+            'rusers')
+                echo "[*] commande en dev..."
+                ;;
+            'rhost')
+                echo "[*] commande en dev..."
+                ;;
+
+            'connect')
+                echo "[*] commande en dev..."
+                ;;
+
+            'su')
+                echo "[*] commande en dev..."
+                ;;
+
+            'passwd')
+                echo "[*] commande en dev..."
+                ;;
+
+            'finger')
+                echo "[*] commande en dev..."
+                ;;
+
+            'write')
+                echo "[*] commande en dev..."
+                ;;
+
+            '')
+                continue
+                ;;
+
+            '?') 
+                help_cmd "user"
+                ;;
+
+            *) 
+                echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
+                ;;
+        esac
+
+   done
+
+   write_logs "$username" "$hostname" "disconnected"
 }
 
-function adminMode {
 
 
-
-    logInFunc "Admin" "rvsh"
-    
-	while [ ! "$cmd" = "exit" ]
-	do
-	    echo -e -n "${Red}rvsh > $White"
-		read  cmd 
-		echo -e -n "$NC"
-		handleCmd "$cmd" $1
-	done
-
-}
 
 
 
 ####################################################
 #
-#
-# Script Begining
-#
+# SCRIPT BEGINING
 #
 ####################################################
 
@@ -241,8 +269,8 @@ ARGS=$(getopt -o hac: -l "help,admin,connect:" -n "rvsh.sh" -- "$@");
 eval set -- $ARGS
     
 # variables
-admin_mode=""
-users_mode=""
+admin_flag=""
+user_flag=""
 hostname=""
 username=""
 
@@ -253,11 +281,6 @@ then
     usage
 fi
 
-############### GAEL ####################
-# je vais retoucher quelques trucs dans la 
-# partie ci-dessous...
-# par pitié ne touche a rien...
-########################################
 
 while true; do
     
@@ -271,28 +294,69 @@ while true; do
             
         -a | --admin)
         shift
-        admin_mode="true"
-        #adminMode "-admin" # ?????
+        admin_flag="on"
+        
+        break
         ;;
             
         -c | --connect)
         shift
+        user_flag="on"
         hostname="$1"
         shift 2
-        username="$1"
-        #userMode "-connect" $USERNAME $HOSTNAME    
+
+        if [ -z "$1" ] 
+        then
+            echo "Vous devez preciser le nom d'utilisateur..."
+            exit
+        else
+            username="$1"
+        fi 
+        
+        break
         ;;
             
         --)
         shift;
         break;
         ;;
+
     esac
+
 done
 
 
+# si le mode administrateur est actif 
+# il prime sur le mode utilisateur 
+#
+if [ "$admin_flag" = "on" ]
+then
+    
+    md5_pass="6f55b656e660c72e2e38b8a68c598703"
+    read -p "[*] administrator password: " -s pass
+    
+    if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$md5_pass" ]
+    then
+        echo ""
+        handle_admin_cmd
+    else
+        echo -e  "\n[!] wrong password for administrator"
+        exit
+    fi
 
+elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
+then
 
+    handle_user_cmd $username $hostname
 
+else
 
+    exit
 
+fi
+
+####################################################
+#
+# SCRIPT END
+#
+####################################################
