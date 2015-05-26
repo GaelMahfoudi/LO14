@@ -89,6 +89,16 @@ function help_cmd {
 }
 
 
+function connect {
+    exit
+}
+
+function disconnect {
+    exit
+}
+
+
+
 
 #
 # DOCUMENTATION write_logs
