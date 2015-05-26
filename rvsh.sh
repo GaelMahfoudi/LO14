@@ -138,7 +138,7 @@ function handle_admin_cmd {
                 
                 ;;
 
-            'clear')
+            'clear' | 'c')
                 clear
                 ;;
 
