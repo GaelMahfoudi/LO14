@@ -9,6 +9,7 @@
 
 
 source sources/sbin/host.sh
+source sources/sbin/users.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -156,7 +157,7 @@ function handle_admin_cmd {
                 host $param
                 ;;
             'user')
-                echo "[*] commande en dev..."
+                user $param
                 ;;
             
             '')
