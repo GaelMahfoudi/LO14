@@ -45,6 +45,10 @@ BWHIHTE='\e[1;37m'      # White
 #
 ####################################################
 
+
+# 'usage'
+# affiche l'aide de la commande `rvsh.sh`
+#
 function usage {
 
     echo "Usage: $(basename $0) [--admin | --connect <hostname> <username>]"
@@ -61,43 +65,40 @@ function usage {
 }
 
 
+# 'connect'
+# fonction qui réalise la connexion
+# ainsi que l'authentification d'un utilisateur sur une VM
+# 
+# $1: le nom de l'utilisateur (doit exister)
+# $2: le nom de la VM (doit exister)
 #
-# DOCUMENTATION help_cmd
-# les cmd sont lues a partie des fichier .admincmd et .usercmd
-#
-
-function help_cmd {
-
-    local mode="$1"
-    local file=""
-
-    if [ "$mode" = "admin" ]
-    then
-
-        file=$PWD/.admincmd
-
-    else
-
-        file=$PWD/.usercmd
-
-    fi
-    
-    # on lit le fichier d'aide associé au mode
-    echo -en "$(head -2 $file)\n\n"
-    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
-
-}
-
-
 function connect {
     exit
 }
 
+
+# 'disconnect'
+# fonction qui réalise la deconnexion
+# d'un utilisateur d'une VM
+#
+# $1: le nom de l'utilisateur
+# $2: le nom de la VM
+#
 function disconnect {
     exit
 }
 
 
+# 'password'
+# fonction qui réalise demande le mot de passe de l'utilisateur
+# suite à une requete de connexion
+# 
+# $1: le nom de l'utilisateur
+# $2: 
+#
+function password {
+    exit
+}
 
 
 #
@@ -124,6 +125,31 @@ function write_logs {
     echo -e "${prompt_log} >  $username @ $hostname: $message" >> /home/rvsh/log/$rep_log/syslogs
 }   
 
+
+
+# 'help_cmd'
+# 
+function help_cmd {
+
+    local mode="$1"
+    local file=""
+
+    if [ "$mode" = "admin" ]
+    then
+
+        file=$PWD/.admincmd
+
+    else
+
+        file=$PWD/.usercmd
+
+    fi
+    
+    # on lit le fichier d'aide associé au mode
+    echo -en "$(head -2 $file)\n\n"
+    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
+
+}
 
 
 #
