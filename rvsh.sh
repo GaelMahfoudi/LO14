@@ -36,7 +36,7 @@ BCYAN='\e[1;36m'        # Cyan
 BWHIHTE='\e[1;37m'      # White
 
 
-
+ROOT="/home/rvsh"
 
 
 ####################################################
@@ -44,6 +44,48 @@ BWHIHTE='\e[1;37m'      # White
 # FUNCTIONS
 #
 ####################################################
+
+
+# 'install'
+#   fonction d'installation du programme
+#   rvsh.sh
+#
+function install {
+
+    # on doit etre administrateur pour installer le programme
+    if [ "$(whoami)" != "root" ]
+    then
+
+        echo "[error] installing $(basename $0): you must be root..."
+        exit
+
+    else
+
+        echo "[*] installing $(basename $0)..."
+        echo "[*] adding user rvsh..."
+        echo -n "[*] enter password for rvsh: "
+        pass=$(mkpasswd)
+
+        useradd --home $ROOT --uid 1010 --shell /bin/bash --password "$pass" rvsh
+
+        # si le repertoir existe deja
+        if [ -d $ROOT ]
+        then
+            read -p "[*] $ROOT already exists, do you want to reinstall it ? [Y/n]" reply
+
+            case $reply in
+
+                Y|y|O|o) 
+                rm -r $ROOT
+                ;;
+
+                *) 
+                echo "[!!] installation "
+
+
+    fi
+
+}
 
 
 # 'usage'
@@ -58,6 +100,8 @@ function usage {
     echo "  -c, --connect    log in the virtual machine as simple user"
     echo "                   you must specify the hostname and the username."
     echo "                   (you can connect as a guest, use guest for both username and hostname)"
+    echo "  -i, --install    install this program and exit"
+    echo "  -u, --uninstall  uninstall this program and exit"
     echo ""
     
     exit 1
@@ -73,7 +117,21 @@ function usage {
 # $2: le nom de la VM (doit exister)
 #
 function connect {
-    exit
+    
+    local username="$1"
+    local hostname="$2"
+
+
+    # si connexion en mode admin
+    if [ "$username" = "admin" ]
+    then
+
+
+
+    else
+
+    fi
+
 }
 
 
@@ -96,7 +154,7 @@ function disconnect {
 # $1: le nom de l'utilisateur
 # $2: 
 #
-function password {
+function handle_password {
     exit
 }
 
@@ -121,7 +179,6 @@ function write_logs {
 	    mkdir -p /home/rvsh/log/$rep_log
     fi
     
-    
     echo -e "${prompt_log} >  $username @ $hostname: $message" >> /home/rvsh/log/$rep_log/syslogs
 }   
 
@@ -129,27 +186,27 @@ function write_logs {
 
 # 'help_cmd'
 # 
-function help_cmd {
+# function help_cmd {
 
-    local mode="$1"
-    local file=""
+#     local mode="$1"
+#     local file=""
 
-    if [ "$mode" = "admin" ]
-    then
+#     if [ "$mode" = "admin" ]
+#     then
 
-        file=$PWD/.admincmd
+#         file=$PWD/.admincmd
 
-    else
+#     else
 
-        file=$PWD/.usercmd
+#         file=$PWD/.usercmd
 
-    fi
+#     fi
     
-    # on lit le fichier d'aide associé au mode
-    echo -en "$(head -2 $file)\n\n"
-    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
+#     # on lit le fichier d'aide associé au mode
+#     echo -en "$(head -2 $file)\n\n"
+#     echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
 
-}
+# }
 
 
 #
@@ -314,6 +371,9 @@ eval set -- $ARGS
 # variables
 admin_flag=""
 user_flag=""
+install_flag=""
+uninstall_flag=""
+
 hostname=""
 username=""
 
