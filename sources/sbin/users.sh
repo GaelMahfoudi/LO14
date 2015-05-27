@@ -30,7 +30,14 @@ function del-user {
 
 function change_password {
 
-    echo "$1"
+    local pass=""
+    
+    while [ "$pass" = "" ]
+    do
+        read -p "Enter the new password for $1 : " pass
+    done
+    
+    echo "$pass" | md5sum | cut -d ' ' -f1 > /home/rvsh/user/$1/password
 
 }
 
@@ -45,14 +52,11 @@ function user {
     
     getopts "a:r:p:lh" OPTION
     
-    echo $OPTARG
-    shift $((OPTIND-1))
-    echo $OPTARG
     
     case "$OPTION" in
         "a" ) add-user $OPTARG;;
         "r" ) del-user $OPTARG;;
-        "p" ) change_password "$OPTARG";;
+        "p" ) change_password $OPTARG;;
         "l" ) user-list;;
         "h" ) echo "aide";;
     esac
