@@ -46,48 +46,140 @@ ROOT="/home/rvsh"
 ####################################################
 
 
+
+# 'build_help'
+#   constuit les fichier les fichiers d'aide principal de `rvsh.sh`
+#   l'aide est accessible via `?` dans le prompt
+#   construit 2 fichier:
+#       admincmd: pour les commandes aministrateur
+#       userscmd: pour les commandes utilisateur
+#
+function build_help {
+
+    # admincmd
+    echo "Aide des commandes administrateur (tapez <cmd> -h pour plus d'information)" >> $ROOT/.help/admincmd
+    echo "" >> $ROOT/.help/admincmd
+    echo "'host': ajoute/enleve une machine du reseau virtuel" >> $ROOT/.help/admincmd
+    echo "'users': ajoute/enleve un utilisateur du reseau virtuel" >> $ROOT/.help/admincmd
+    echo "'afinger': renseigne des information complementaire sur l'utilisateur" >> $ROOT/.help/admincmd
+
+    # userscmd (fair les modifications)
+    echo "Aide des commandes utilisateur (tapez <cmd> -h pour plus d'information)" >> $ROOT/.help/userscmd
+    echo "" >> $ROOT/.help/userscmd
+    echo "'host': ajoute/enleve une machine du reseau virtuel" >> $ROOT/.help/userscmd
+    echo "'users': ajoute/enleve un utilisateur du reseau virtuel" >> $ROOT/.help/userscmd
+    echo "'afinger': renseigne des information complementaire sur l'utilisateur" >> $ROOT/.help/userscmd
+}
+
+
 # 'install'
 #   fonction d'installation du programme
 #   rvsh.sh
 #
-#function install {
+function install {
+
+    declare -a directories
+    directories[0]='host'               # dossier des VMs
+    directories[1]='users'              # dossier des utilisateurs
+    directories[2]='users/admin'        # dossier administrateur
+    directories[3]='.logs'              # dossier des logs
+    directories[4]='.help'              # dossier de l'aide principale des commandes
+
 
     # on doit etre administrateur pour installer le programme
-  #  if [ "$(whoami)" != "root" ]
- #   then
+    if [ "$(whoami)" != "root" ]
+    then
+
+        echo "[error] installing $(basename $0): you must be root..."
+        exit
+
+    else
+
+        echo "[*] installing $(basename $0)..."
+
+        
+        addgroup rvsh > /dev/null 2>&1
+        if [ $? -eq 0 ]
+        then
+            echo "install> group 'rvsh' has been created..."
+        else
+            echo "[error] in addgroup: 'rvsh' already exists"
+            exit
+        fi
+
+        adduser $SUDO_USER rvsh > /dev/null 2>&1
+        if [ $? -eq 0 ]
+        then
+            echo "install> '$SUDO_USER' has been added to group rvsh..."
+        else
+            echo "[error] in a adduser '$SUDO_USER' cannot be added to rvsh..."
+            exit
+        fi
+
+        echo "umask 0002" >> /etc/profiles
+        
+        echo "install> making home directory in '$ROOT'"
+
+        if [ -d $ROOT ]
+        then
+
+            echo "install> '$ROOT' already exists..."
+
+        else
+
+            mkdir $ROOT
+            chgrp -R rvsh /home/rvsh
+            chmod -R g+rwx,o-rwx $ROOT
+            chmod -R g+s $ROOT
+
+
+            echo -e "install> added directories:"
+            for dir in ${directories[*]}
+            do
+                
+                echo -e "\t'$dir' has been created"
+                mkdir $ROOT/$dir
+                
+            done
+
+            build_help
+
+
+        fi
+
+        echo -e "install> Done."
+        
+    fi
+}
+
+
+# 'uninstall'
+#   fonction de desinstallation du programme
+#   rvsh.sh
 #
-  #      echo "[error] installing $(basename $0): you must be root..."
- #       exit
-#
- #   else
-#
-    #    echo "[*] installing $(basename $0)..."
-   #     echo "[*] adding user rvsh..."
-  #      echo -n "[*] enter password for rvsh: "
- #       pass=$(mkpasswd)
-#
- #       useradd --home $ROOT --uid 1010 --shell /bin/bash --password "$pass" rvsh
-#
-        # si le repertoir existe deja
-   #     if [ -d $ROOT ]
-  #      then
- #           read -p "[*] $ROOT already exists, do you want to reinstall it ? [Y/n]" reply
-#
- #           case $reply in
-#
-    #            Y|y|O|o) 
-   #             rm -r $ROOT
-  #              ;;
- #               *) echo "[!!] installation ";;
-#
- #       fi
-#   fi
-#
-#}
+function uninstall {
+
+
+    if [ "$(whoami)" != "root" ]
+    then
+
+        echo "[error] uninstalling $(basename $0): you must be root..."
+        exit
+
+    else
+
+        echo "[*] uninstall $(basename $0)..."
+        (delgroup rvsh > /dev/null 2> /dev/null && echo "> rvsh has been removed") || echo "> group 'rvsh' does not exist"        # suppression de l'utilisateur
+        (rm -r $ROOT 2> /dev/null && echo "> $ROOT has been removed") || echo "> $ROOT does not exist"       # suppression de l'architecture personnelle
+
+    fi
+
+    exit
+}
 
 
 # 'usage'
-# affiche l'aide de la commande `rvsh.sh`
+#   affiche l'aide de la commande `rvsh.sh`
 #
 function usage {
 
@@ -103,7 +195,6 @@ function usage {
     echo ""
     
     exit 1
-
 }
 
 
@@ -127,7 +218,6 @@ function connect {
     else
         echo "bite"
     fi
-
 }
 
 
@@ -152,24 +242,24 @@ function disconnect {
 #
 function handle_password {
     
+    local username="$1"
     local pass=""
     local userpass=""
     
-    if [ -e $ROOT/user/$1/password ]
+    if [ -e $ROOT/user/$username/password ]
     then
-        read -p "[*] $1 password: " -s pass 
+        read -p "[*] $username password: " -s pass 
         
-        userpass=$(cat $ROOT/user/$1/password)
+        userpass=$(cat $ROOT/user/$username/password)
         
         if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ]
         then
-            echo -e "\nConnected as $1"
+            echo -e "\nConnected as $username"
         else
-            echo -e  "\n[!] wrong password for $1"
+            echo -e  "\n[!] wrong password for $username"
             exit
         fi
     fi
-    
 }
 
 
@@ -188,39 +278,38 @@ function write_logs {
     
 
     # si le dossier de log n'existe pas, on le cree
-    if [ ! -d /home/rvsh/log/$rep_log ]
+    if [ ! -d $ROOT/.log/$rep_log ]
     then
-	    mkdir -p /home/rvsh/log/$rep_log
+        mkdir -p $ROOT/.log/$rep_log
     fi
     
-    echo -e "${prompt_log} >  $username @ $hostname: $message" >> /home/rvsh/log/$rep_log/syslogs
-}   
+    echo -e "${prompt_log} >  $username @ $hostname: $message" >> $ROOT/.log/$rep_log/syslogs
+} 
 
 
 
 # 'help_cmd'
 # 
-# function help_cmd {
+function help_cmd {
 
-#     local mode="$1"
-#     local file=""
+    local mode="$1"
+    local file=""
 
-#     if [ "$mode" = "admin" ]
-#     then
+    if [ "$mode" = "admin" ]
+    then
 
-#         file=$PWD/.admincmd
+        file=$ROOT/.help/admincmd
 
-#     else
+    else
 
-#         file=$PWD/.usercmd
+        file=$ROOT/.help/userscmd
 
-#     fi
+    fi
     
-#     # on lit le fichier d'aide associé au mode
-#     echo -en "$(head -2 $file)\n\n"
-#     echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
-
-# }
+    # on lit le fichier d'aide associé au mode
+    echo -en "$(head -2 $file)\n\n"
+    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
+}
 
 
 #
@@ -378,100 +467,117 @@ function handle_user_cmd {
 ####################################################
 
 
-# parse the command line
-ARGS=$(getopt -o hac: -l "help,admin,connect:" -n "rvsh.sh" -- "$@");
-eval set -- $ARGS
-    
-# variables
-admin_flag=""
-user_flag=""
-install_flag=""
-uninstall_flag=""
+function main {
 
-hostname=""
-username=""
+    # parse the command line
+    ARGS=$(getopt -o hac:iu -l "help,admin,connect:,install,uninstall" -n "rvsh.sh" -- "$@");
+    eval set -- $ARGS
+        
+    # variables
+    admin_flag=""
+    user_flag=""
+    install_flag=""
+    uninstall_flag=""
 
-
-# not enough arguments
-if [ $# -eq 1 ]
-then 
-    usage
-fi
+    hostname=""
+    username=""
 
 
-while true; do
-    
-    case "$1" in
-            
-        -h | --help)
-        shift
+
+    # not enough arguments
+    if [ $# -eq 1 ]
+    then 
         usage
-        ;;
-            
-            
-        -a | --admin)
-        shift
-        admin_flag="on"
-        
-        break
-        ;;
-            
-        -c | --connect)
-        shift
-        user_flag="on"
-        hostname="$1"
-        shift 2
-
-        if [ -z "$1" ] 
-        then
-            echo "Vous devez preciser le nom d'utilisateur..."
-            exit
-        else
-            username="$1"
-        fi 
-        
-        break
-        ;;
-            
-        --)
-        shift;
-        break;
-        ;;
-
-    esac
-
-done
-
-
-# si le mode administrateur est actif 
-# il prime sur le mode utilisateur 
-#
-if [ "$admin_flag" = "on" ]
-then
-    
-    md5_pass="6f55b656e660c72e2e38b8a68c598703"
-    read -p "[*] administrator password: " -s pass
-    
-    if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$md5_pass" ]
-    then
-        echo ""
-        handle_admin_cmd
-    else
-        echo -e  "\n[!] wrong password for administrator"
-        exit
     fi
 
-elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
-then
+    while true; do
+        
+        case "$1" in
+                
+            -h | --help)
+            shift
+            usage
+            ;;
+                
+                
+            -a | --admin)
+            shift
+            admin_flag="on"
+            
+            break
+            ;;
+                
+            -c | --connect)
+            shift
+            user_flag="on"
+            hostname="$1"
+            shift 2
 
-    handle_password $username
-    handle_user_cmd $username $hostname
+            if [ -z "$1" ] 
+            then
+                echo "Vous devez preciser le nom d'utilisateur..."
+                exit
+            else
+                username="$1"
+            fi 
+            
+            break
+            ;;
+                
 
-else
+            -i | --install)
+            install
+            break
+            ;;
 
-    exit
+            -u | --uninstall)
+            uninstall
+            break
+            ;;
 
-fi
+
+            --)
+            shift;
+            break;
+            ;;
+
+        esac
+
+    done
+
+    # si le mode administrateur est actif 
+    # il prime sur le mode utilisateur 
+    #
+    if [ "$admin_flag" = "on" ]
+    then
+        
+        # md5_pass="6f55b656e660c72e2e38b8a68c598703"
+        # read -p "[*] administrator password: " -s pass
+        
+        # if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$md5_pass" ]
+        # then
+        #     echo ""
+            handle_admin_cmd
+        # else
+        #     echo -e  "\n[!] wrong password for administrator"
+        #     exit
+        # fi
+
+    elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
+    then
+
+        handle_password $username
+        handle_user_cmd $username $hostname
+
+    else
+
+        exit
+
+    fi
+
+}
+
+main "$@"
 
 ####################################################
 #
