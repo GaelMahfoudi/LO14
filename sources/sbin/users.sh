@@ -28,6 +28,12 @@ function del-user {
 
 }
 
+function change_password {
+
+    echo "$1"
+
+}
+
 function user {
 
     if [ ! -d /home/rvsh/user ]
@@ -37,11 +43,16 @@ function user {
     
     local OPTIND
     
-    getopts "a:r:c:lh" OPTION
+    getopts "a:r:p:lh" OPTION
+    
+    echo $OPTARG
+    shift $((OPTIND-1))
+    echo $OPTARG
     
     case "$OPTION" in
         "a" ) add-user $OPTARG;;
         "r" ) del-user $OPTARG;;
+        "p" ) change_password "$OPTARG";;
         "l" ) user-list;;
         "h" ) echo "aide";;
     esac
