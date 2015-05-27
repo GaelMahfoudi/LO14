@@ -41,6 +41,28 @@ function change_password {
 
 }
 
+
+function user_config {
+    
+    local username=$1
+    local user_config_prompt="${RED}rvsh config-$1>${NC}"
+    local cmd=""
+    
+    while [ ! \( "$cmd" = "q" -o "$cmd" = "quit" \) ]
+    do
+        echo -en "$user_config_prompt "
+        read tmp
+        cmd=($tmp)
+        cmd=${cmd[0]}
+        param=${tmp:${#cmd}}
+        
+        case $cmd in
+            "password" ) change_password $param;;
+        esac
+    done
+
+}
+
 function user {
 
     if [ ! -d /home/rvsh/user ]
@@ -50,13 +72,13 @@ function user {
     
     local OPTIND
     
-    getopts "a:r:p:lh" OPTION
+    getopts "a:r:c:lh" OPTION
     
     
     case "$OPTION" in
         "a" ) add-user $OPTARG;;
         "r" ) del-user $OPTARG;;
-        "p" ) change_password $OPTARG;;
+        "c" ) user_config $OPTARG;;
         "l" ) user-list;;
         "h" ) echo "aide";;
     esac
