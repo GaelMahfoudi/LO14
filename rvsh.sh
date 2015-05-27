@@ -50,42 +50,40 @@ ROOT="/home/rvsh"
 #   fonction d'installation du programme
 #   rvsh.sh
 #
-function install {
+#function install {
 
     # on doit etre administrateur pour installer le programme
-    if [ "$(whoami)" != "root" ]
-    then
-
-        echo "[error] installing $(basename $0): you must be root..."
-        exit
-
-    else
-
-        echo "[*] installing $(basename $0)..."
-        echo "[*] adding user rvsh..."
-        echo -n "[*] enter password for rvsh: "
-        pass=$(mkpasswd)
-
-        useradd --home $ROOT --uid 1010 --shell /bin/bash --password "$pass" rvsh
-
+  #  if [ "$(whoami)" != "root" ]
+ #   then
+#
+  #      echo "[error] installing $(basename $0): you must be root..."
+ #       exit
+#
+ #   else
+#
+    #    echo "[*] installing $(basename $0)..."
+   #     echo "[*] adding user rvsh..."
+  #      echo -n "[*] enter password for rvsh: "
+ #       pass=$(mkpasswd)
+#
+ #       useradd --home $ROOT --uid 1010 --shell /bin/bash --password "$pass" rvsh
+#
         # si le repertoir existe deja
-        if [ -d $ROOT ]
-        then
-            read -p "[*] $ROOT already exists, do you want to reinstall it ? [Y/n]" reply
-
-            case $reply in
-
-                Y|y|O|o) 
-                rm -r $ROOT
-                ;;
-
-                *) 
-                echo "[!!] installation "
-
-
-    fi
-
-}
+   #     if [ -d $ROOT ]
+  #      then
+ #           read -p "[*] $ROOT already exists, do you want to reinstall it ? [Y/n]" reply
+#
+ #           case $reply in
+#
+    #            Y|y|O|o) 
+   #             rm -r $ROOT
+  #              ;;
+ #               *) echo "[!!] installation ";;
+#
+ #       fi
+#   fi
+#
+#}
 
 
 # 'usage'
@@ -125,11 +123,9 @@ function connect {
     # si connexion en mode admin
     if [ "$username" = "admin" ]
     then
-
-
-
+        echo "bite"
     else
-
+        echo "bite"
     fi
 
 }
@@ -155,7 +151,25 @@ function disconnect {
 # $2: 
 #
 function handle_password {
-    exit
+    
+    local pass=""
+    local userpass=""
+    
+    if [ -e $ROOT/user/$1/password ]
+    then
+        read -p "[*] $1 password: " -s pass 
+        
+        userpass=$(cat $ROOT/user/$1/password)
+        
+        if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ]
+        then
+            echo -e "\nConnected as $1"
+        else
+            echo -e  "\n[!] wrong password for $1"
+            exit
+        fi
+    fi
+    
 }
 
 
@@ -450,6 +464,7 @@ then
 elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
 then
 
+    handle_password $username
     handle_user_cmd $username $hostname
 
 else
