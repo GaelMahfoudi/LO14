@@ -36,7 +36,7 @@ BCYAN='\e[1;36m'        # Cyan
 BWHIHTE='\e[1;37m'      # White
 
 
-ROOT="/home/rvsh"
+ROOT="$HOME/rvsh"
 
 
 ####################################################
@@ -87,69 +87,83 @@ function install {
 
 
     # on doit etre administrateur pour installer le programme
-    if [ "$(whoami)" != "root" ]
-    then
+    # if [ "$(whoami)" != "root" ]
+    # then
 
-        echo "[error] installing $(basename $0): you must be root..."
-        exit
+    #     echo "[error] installing $(basename $0): you must be root..."
+    #     exit
 
-    else
+    # else
 
         echo "[*] installing $(basename $0)..."
 
-        
-        addgroup rvsh > /dev/null 2>&1
-        if [ $? -eq 0 ]
-        then
-            echo "install> group 'rvsh' has been created..."
-        else
-            echo "[error] in addgroup: 'rvsh' already exists"
-            exit
-        fi
-
-        adduser $SUDO_USER rvsh > /dev/null 2>&1
-        if [ $? -eq 0 ]
-        then
-            echo "install> '$SUDO_USER' has been added to group rvsh..."
-        else
-            echo "[error] in a adduser '$SUDO_USER' cannot be added to rvsh..."
-            exit
-        fi
-
-        echo "umask 0002" >> /etc/profiles
-        
-        echo "install> making home directory in '$ROOT'"
-
+        # creation du dossier de partage
         if [ -d $ROOT ]
         then
-
             echo "install> '$ROOT' already exists..."
-
         else
-
+            echo "install> making home directory in '$ROOT'"
             mkdir $ROOT
-            chgrp -R rvsh /home/rvsh
-            chmod -R g+rwx,o-rwx $ROOT
-            chmod -R g+s $ROOT
-
-
-            echo -e "install> added directories:"
-            for dir in ${directories[*]}
-            do
-                
-                echo -e "\t'$dir' has been created"
-                mkdir $ROOT/$dir
-                
-            done
-
-            build_help
-
-
         fi
 
-        echo -e "install> Done."
+        echo -e "install> added directories:"
+        for dir in ${directories[*]}
+        do
+            
+            echo -e "\t'$dir' has been created"
+            mkdir $ROOT/$dir
+                
+        done
+
         
-    fi
+        build_help
+        
+        # admin password creation
+        touch $ROOT/users/admin/password
+        echo "6f55b656e660c72e2e38b8a68c598703" > $ROOT/users/admin/password     
+
+
+        # # creation du groupe de partage
+        # groupadd rvsh > /dev/null 2>&1
+        # if [ $? -eq 0 ]
+        # then
+        #     echo "install> group 'rvsh' has been created..."
+        # else
+        #     echo "[error] in addgroup: 'rvsh' already exists"
+        #     exit
+        # fi
+
+        
+        # # creation de l'administrateur du groupe
+        # useradd -d $ROOT -g rvsh rvsh > /dev/null 2>&1
+        # if [ $? -eq 0 ]
+        # then
+        #     echo "install> 'rvsh' has been added to group rvsh..."
+        # else
+        #     echo "[error] in a adduser 'rvsh' cannot be added to rvsh..."
+        #     exit
+        # fi        
+
+
+        # # ajout de l'utilisateur au groupe
+        # usermod -a -G rvsh $SUDO_USER 
+        # if [ $? -eq 0 ]
+        # then
+        #     echo "install> '$SUDO_USER' has been added to group rvsh..."
+        # else
+        #     echo "[error] in a adduser '$SUDO_USER' cannot be added to rvsh..."
+        #     exit
+        # fi
+
+        # chown -R rvsh:rvsh $ROOT
+        # chmod -R 775 $ROOT
+        # chmod -R g+s $ROOT
+    
+
+        echo -e "install> Done."
+
+    # fi
+
 }
 
 
@@ -169,9 +183,10 @@ function uninstall {
     else
 
         echo "[*] uninstall $(basename $0)..."
-        (delgroup rvsh > /dev/null 2> /dev/null && echo "> rvsh has been removed") || echo "> group 'rvsh' does not exist"        # suppression de l'utilisateur
-        (rm -r $ROOT 2> /dev/null && echo "> $ROOT has been removed") || echo "> $ROOT does not exist"       # suppression de l'architecture personnelle
-
+        # userdel rvsh         # suppression de l'utilisateur
+        # groupdel rvsh        # suppression du groupe
+        rm -r $ROOT        # suppression de l'architecture personnelle
+        
     fi
 
     exit
