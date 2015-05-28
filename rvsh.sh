@@ -183,10 +183,10 @@ password() {
 
 
         if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ]; then
-            echo -e "[*] you are now logged as $username on $hostname\n"
+            echo -e "\n[*] you are now logged as $username on $hostname\n"
             return 0  # success
         else
-            echo -e "[!] bad password for user admin"
+            echo -e "\n[!] bad password for user admin\n"
             return 1 # fail
         fi
     
@@ -206,14 +206,22 @@ connect() {
 
 
     # si connexion en mode admin
-    if [ "$username" = "admin" ]; then
-        
-        password "admin" "rvsh" 
+    password "$username"  "$hostname"
 
+    if [ $? -eq 0 ]; then
+    
+        write_logs $username $hostname "connected"
+    
+        if [ "$username" = "admin" ]; then
+            handle_admin_cmd $username $hostname
+        else
+            handle_users_cmd
+        fi
+    
+        write_logs $username $hostname "disconnected"
+    
     else
-        
-        password "username" 
-
+        return 
     fi
 }
 
@@ -240,26 +248,6 @@ write_logs() {
     
     echo -e "${prompt_log} >  $username @ $hostname: $message" >> $ROOT/.log/$rep_log/syslogs
 } 
-
-
-
-# 'help_cmd'
-# 
-help_cmd() {
-
-    local mode="$1"
-    local file=""
-
-    if [ "$mode" = "admin" ]; then
-        file=$ROOT/.help/admincmd
-    else
-        file=$ROOT/.help/userscmd
-    fi
-    
-    # on lit le fichier d'aide associé au mode
-    echo -en "$(head -2 $file)\n\n"
-    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
-}
 
 
 #
@@ -321,16 +309,13 @@ handle_admin_cmd() {
 #
 # DOCUMENTATION handle_admin_cmd
 #
-function handle_user_cmd {
+function handle_users_cmd {
 
 
     local username="$1"
     local hostname="$2"
     local cmd=""    # commande entree par l'utilisateur
     local user_prompt="${GREEN}${username}@${hostname} >${NC}"
-
-    write_logs "$username" "$hostname" "connected"
-    
     
     while [ "$cmd" != "quit" ]
     do
@@ -393,12 +378,29 @@ function handle_user_cmd {
         esac
 
    done
-
-   write_logs "$username" "$hostname" "disconnected"
 }
 
 
 
+
+
+# 'help_cmd'
+# 
+help_cmd() {
+
+    local mode="$1"
+    local file=""
+
+    if [ "$mode" = "admin" ]; then
+        file=$ROOT/.help/admincmd
+    else
+        file=$ROOT/.help/userscmd
+    fi
+    
+    # on lit le fichier d'aide associé au mode
+    echo -en "$(head -2 $file)\n\n"
+    echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
+}
 
 
 
@@ -409,7 +411,7 @@ function handle_user_cmd {
 ####################################################
 
 
-function main {
+main() {
 
     # parse the command line
     ARGS=$(getopt -o hac:iu -l "help,admin,connect:,install,uninstall" -n "rvsh.sh" -- "$@");
@@ -492,12 +494,11 @@ function main {
     #
     if [ "$admin_flag" = "on" ]; then
         
-        connect "admin"
+        connect "admin" "rvsh"
 
     elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
 
-        connect "$username"
-        handle_user_cmd $username $hostname
+        connect "$username" "$hostname"
 
     else
 
