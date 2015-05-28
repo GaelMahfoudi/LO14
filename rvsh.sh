@@ -186,7 +186,7 @@ password() {
             echo -e "\n[*] you are now logged as $username on $hostname\n"
             return 0  # success
         else
-            echo -e "\n[!] bad password for user admin\n"
+            echo -e "\n[!] bad password for user $username on $hostname\n"
             return 1 # fail
         fi
     
@@ -213,9 +213,9 @@ connect() {
         write_logs $username $hostname "connected"
     
         if [ "$username" = "admin" ]; then
-            handle_admin_cmd $username $hostname
+            handle_admin_cmd
         else
-            handle_users_cmd
+            handle_users_cmd $username $hostname
         fi
     
         write_logs $username $hostname "disconnected"
