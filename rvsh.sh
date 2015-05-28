@@ -8,6 +8,7 @@
 #---------------------------------------------------
 
 
+
 source sources/sbin/host.sh
 source sources/sbin/users.sh
 
@@ -54,21 +55,27 @@ ROOT="$HOME/rvsh"
 #       admincmd: pour les commandes aministrateur
 #       userscmd: pour les commandes utilisateur
 #
-function build_help {
+function make_help {
 
     # admincmd
-    echo "Aide des commandes administrateur (tapez <cmd> -h pour plus d'information)" >> $ROOT/.help/admincmd
-    echo "" >> $ROOT/.help/admincmd
-    echo "'host': ajoute/enleve une machine du reseau virtuel" >> $ROOT/.help/admincmd
-    echo "'users': ajoute/enleve un utilisateur du reseau virtuel" >> $ROOT/.help/admincmd
-    echo "'afinger': renseigne des information complementaire sur l'utilisateur" >> $ROOT/.help/admincmd
+    echo 'Aide des commandes administrateur (tapez <cmd> -h pour plus de precrisions)
 
-    # userscmd (fair les modifications)
-    echo "Aide des commandes utilisateur (tapez <cmd> -h pour plus d'information)" >> $ROOT/.help/userscmd
-    echo "" >> $ROOT/.help/userscmd
-    echo "'host': ajoute/enleve une machine du reseau virtuel" >> $ROOT/.help/userscmd
-    echo "'users': ajoute/enleve un utilisateur du reseau virtuel" >> $ROOT/.help/userscmd
-    echo "'afinger': renseigne des information complementaire sur l'utilisateur" >> $ROOT/.help/userscmd
+host: ajoute/enleve une machine du reseau virtuel
+users: ajoute/enleve un utilisateur du reseau virtuel
+afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.help/admincmd
+
+    # userscmd
+    echo 'Aide des commandes utilisateur (tapez <cmd> -h pour plus de precisions)
+
+who: affiche la liste des utilisateurs connectes sur une VM
+rusers: affiche la liste des utilisateurs connectes au reseau
+rhost: affiche la liste des machines du reseau virtuel
+connect: permet de se connecter a une autre machine
+su: permet de change d utilisateur
+passwd: change le mot de passe de l uitlisateur
+finger: renvoie des elements complementaire sur l utilisateur
+write: envoi un message a un utilisateur connecte' > $ROOT/.help/userscmd
+
 }
 
 
@@ -86,84 +93,34 @@ function install {
     directories[4]='.help'              # dossier de l'aide principale des commandes
 
 
-    # on doit etre administrateur pour installer le programme
-    # if [ "$(whoami)" != "root" ]
-    # then
+    echo "[*] installing $(basename $0)..."
 
-    #     echo "[error] installing $(basename $0): you must be root..."
-    #     exit
+    # creation du dossier de partage
+    if [ -d $ROOT ]
+    then
+        echo "install> '$ROOT' already exists..."
+    else
+        echo "install> making home directory in '$ROOT'"
+        mkdir $ROOT
+    fi
 
-    # else
-
-        echo "[*] installing $(basename $0)..."
-
-        # creation du dossier de partage
-        if [ -d $ROOT ]
-        then
-            echo "install> '$ROOT' already exists..."
-        else
-            echo "install> making home directory in '$ROOT'"
-            mkdir $ROOT
-        fi
-
-        echo -e "install> added directories:"
-        for dir in ${directories[*]}
-        do
+    echo -e "install> added directories:"
+    for dir in ${directories[*]}
+    do
+        
+        echo -e "\t'$dir' has been created"
+        mkdir $ROOT/$dir
             
-            echo -e "\t'$dir' has been created"
-            mkdir $ROOT/$dir
-                
-        done
+    done
 
-        
-        build_help
-        
-        # admin password creation
-        touch $ROOT/users/admin/password
-        echo "6f55b656e660c72e2e38b8a68c598703" > $ROOT/users/admin/password     
-
-
-        # # creation du groupe de partage
-        # groupadd rvsh > /dev/null 2>&1
-        # if [ $? -eq 0 ]
-        # then
-        #     echo "install> group 'rvsh' has been created..."
-        # else
-        #     echo "[error] in addgroup: 'rvsh' already exists"
-        #     exit
-        # fi
-
-        
-        # # creation de l'administrateur du groupe
-        # useradd -d $ROOT -g rvsh rvsh > /dev/null 2>&1
-        # if [ $? -eq 0 ]
-        # then
-        #     echo "install> 'rvsh' has been added to group rvsh..."
-        # else
-        #     echo "[error] in a adduser 'rvsh' cannot be added to rvsh..."
-        #     exit
-        # fi        
-
-
-        # # ajout de l'utilisateur au groupe
-        # usermod -a -G rvsh $SUDO_USER 
-        # if [ $? -eq 0 ]
-        # then
-        #     echo "install> '$SUDO_USER' has been added to group rvsh..."
-        # else
-        #     echo "[error] in a adduser '$SUDO_USER' cannot be added to rvsh..."
-        #     exit
-        # fi
-
-        # chown -R rvsh:rvsh $ROOT
-        # chmod -R 775 $ROOT
-        # chmod -R g+s $ROOT
     
+    make_help
+    
+    # admin password creation
+    touch $ROOT/users/admin/password
+    echo "6f55b656e660c72e2e38b8a68c598703" > $ROOT/users/admin/password     
 
-        echo -e "install> Done."
-
-    # fi
-
+    echo -e "install> Done."
 }
 
 
@@ -196,7 +153,7 @@ function uninstall {
 # 'usage'
 #   affiche l'aide de la commande `rvsh.sh`
 #
-function usage {
+usage() {
 
     echo "Usage: $(basename $0) [--admin | --connect <hostname> <username>]"
     echo ""
@@ -213,67 +170,50 @@ function usage {
 }
 
 
-# 'connect'
-# fonction qui réalise la connexion
-# ainsi que l'authentification d'un utilisateur sur une VM
-# 
-# $1: le nom de l'utilisateur (doit exister)
-# $2: le nom de la VM (doit exister)
-#
-function connect {
+password() {
+
+    local username="$1"
+    local hostname="$2"
+
+
+    if [ -e $ROOT/users/$username/password ]; then
+
+        read -p "[CONNECTION] password for $username : " -s pass
+        userpass=$(cat $ROOT/users/$username/password)
+
+
+        if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ]; then
+            echo -e "[*] you are now logged as $username on $hostname\n"
+            return 0  # success
+        else
+            echo -e "[!] bad password for user admin"
+            return 1 # fail
+        fi
+    
+    fi
+
+    #=== NOTE ===============================
+    # gerer le cas ou le fichier password
+    # n'existe pas
+    #========================================
+}
+
+
+connect() {
     
     local username="$1"
     local hostname="$2"
 
 
     # si connexion en mode admin
-    if [ "$username" = "admin" ]
-    then
-        echo "bite"
+    if [ "$username" = "admin" ]; then
+        
+        password "admin" "rvsh" 
+
     else
-        echo "bite"
-    fi
-}
-
-
-# 'disconnect'
-# fonction qui réalise la deconnexion
-# d'un utilisateur d'une VM
-#
-# $1: le nom de l'utilisateur
-# $2: le nom de la VM
-#
-function disconnect {
-    exit
-}
-
-
-# 'password'
-# fonction qui réalise demande le mot de passe de l'utilisateur
-# suite à une requete de connexion
-# 
-# $1: le nom de l'utilisateur
-# $2: 
-#
-function handle_password {
-    
-    local username="$1"
-    local pass=""
-    local userpass=""
-    
-    if [ -e $ROOT/user/$username/password ]
-    then
-        read -p "[*] $username password: " -s pass 
         
-        userpass=$(cat $ROOT/user/$username/password)
-        
-        if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ]
-        then
-            echo -e "\nConnected as $username"
-        else
-            echo -e  "\n[!] wrong password for $username"
-            exit
-        fi
+        password "username" 
+
     fi
 }
 
@@ -282,7 +222,7 @@ function handle_password {
 # DOCUMENTATION write_logs
 # le mode signifie si c'est une deconnexion ou un connexion
 #
-function write_logs {
+write_logs() {
 
     local username="$1"
     local hostname="$2"
@@ -305,20 +245,15 @@ function write_logs {
 
 # 'help_cmd'
 # 
-function help_cmd {
+help_cmd() {
 
     local mode="$1"
     local file=""
 
-    if [ "$mode" = "admin" ]
-    then
-
+    if [ "$mode" = "admin" ]; then
         file=$ROOT/.help/admincmd
-
     else
-
         file=$ROOT/.help/userscmd
-
     fi
     
     # on lit le fichier d'aide associé au mode
@@ -330,17 +265,12 @@ function help_cmd {
 #
 # DOCUMENTATION handle_admin_cmd
 #
-function handle_admin_cmd {
+handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
     local admin_prompt="${RED}rvsh >${NC}"
-
-    # on ecrit les logs
-    write_logs "admin" "rvsh" "connected"
     
-    
-    while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]
-    do
+    while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
         echo -en "$admin_prompt "
         read tmp
         cmd=($tmp)
@@ -367,7 +297,7 @@ function handle_admin_cmd {
             'host')
                 host $param
                 ;;
-            'user')
+            'users')
                 user $param
                 ;;
             
@@ -385,9 +315,6 @@ function handle_admin_cmd {
         esac
     
    done
-
-    write_logs "admin" "rvsh" "disconnected"
-
 }
 
 
@@ -563,25 +490,13 @@ function main {
     # si le mode administrateur est actif 
     # il prime sur le mode utilisateur 
     #
-    if [ "$admin_flag" = "on" ]
-    then
+    if [ "$admin_flag" = "on" ]; then
         
-        # md5_pass="6f55b656e660c72e2e38b8a68c598703"
-        # read -p "[*] administrator password: " -s pass
-        
-        # if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$md5_pass" ]
-        # then
-        #     echo ""
-            handle_admin_cmd
-        # else
-        #     echo -e  "\n[!] wrong password for administrator"
-        #     exit
-        # fi
+        connect "admin"
 
-    elif [ "$user_flag" = "on" -a -z "$admin_flag" ]
-    then
+    elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
 
-        handle_password $username
+        connect "$username"
         handle_user_cmd $username $hostname
 
     else
