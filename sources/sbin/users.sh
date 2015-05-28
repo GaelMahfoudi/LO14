@@ -61,17 +61,23 @@ change_name() {
     
     
     
-    mkdir $userpath$new
-    cp -r $userpath$old/* $userpath$new
-    rm -r $userpath$old
+    mkdir $ROOT/users/$new
+    cp -r $ROOT/users/$old/* $ROOT/users/$new
+    rm -r $ROOT/users/$old
     
 }
 
 add_access_host() {
 
-    local userpath="home/rvsh/user/"
-    local newhost=$1
-    echo -e "$1\n" >> $userpath/hostlist
+    
+    local newhost=""
+    
+    while [ "$newhost" = "" ]
+    do
+        read -p "Enter the new accessible host for $1: " newname
+    done
+    
+    echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
 
 }
 
@@ -97,7 +103,9 @@ users() {
         "r" ) del_user $OPTARG;;
         "p" ) change_password $OPTARG;;
         "n" ) change_name $OPTARG;;
+        "m" ) add_access_host $OPTARG;;
         "l" ) user_list;;
         "h" ) help_users;;
+        * ) help_users;;
     esac
 }
