@@ -26,13 +26,17 @@ add_user() {
 
 del_user() {
 
-    
-    if [ -d $ROOT/users/$1 ]
-    then 
-        rm -r $ROOT/users/$1
-        echo -e "The user $1 has been removed."
+    if [ ! "$1" = "admin" ]
+    then
+        if [ -d $ROOT/users/$1 ]
+        then 
+            rm -r $ROOT/users/$1
+            echo -e "The user $1 has been removed."
+        else
+            echo -e "The user $1 doesn't exist."
+        fi
     else
-        echo -e "The user $1 doesn't exist."
+        echo "You can't remove the administrator"
     fi
 
 }
@@ -52,35 +56,45 @@ change_password() {
 
 change_name() {
     
-    local username=$1
     
-    local newname=""
+    if [ ! "$1" = "admin" ]
+    then
+        local username=$1
     
-    while [ "$newname" = "" ]
-    do
-        read -p "Enter the new name for $username: " newname
-    done
+        local newname=""
+    
+        while [ "$newname" = "" ]
+        do
+            read -p "Enter the new name for $username: " newname
+        done
     
     
     
-    mkdir $ROOT/users/$newname
-    cp -r $ROOT/users/$username/* $ROOT/users/$newname
-    rm -r $ROOT/users/$username
+        mkdir $ROOT/users/$newname
+        cp -r $ROOT/users/$username/* $ROOT/users/$newname
+        rm -r $ROOT/users/$username
+    
+    else
+        echo "You can't rename the administrator"
+    fi
     
 }
 
 add_access_host() {
 
+    if [ ! "$1" = "admin" ]
+    then
+        local newhost=""
     
-    local newhost=""
+        while [ "$newhost" = "" ]
+        do
+            read -p "Enter the new accessible host for $1: " newname
+        done
     
-    while [ "$newhost" = "" ]
-    do
-        read -p "Enter the new accessible host for $1: " newname
-    done
-    
-    echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
-
+        echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
+    else
+        echo "You can't add host to the administrator"
+    fi
 }
 
 help_users() {
