@@ -270,8 +270,7 @@ handle_admin_cmd() {
         # lecture de la commande entree
         case "$cmd" in
 
-            'quit' | 'q') 
-                
+            'quit' | 'q')
                 ;;
 
             'clear' | 'c')
@@ -286,7 +285,8 @@ handle_admin_cmd() {
                 host $param
                 ;;
             'users')
-                user $param
+            
+                users $param
                 ;;
             
             '')

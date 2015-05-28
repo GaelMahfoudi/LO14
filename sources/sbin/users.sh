@@ -1,34 +1,41 @@
-function user-list {
-    echo -e -n "$White"
-    echo -e -n $(ls /home/rvsh/user)
-    echo -e "$NC"
-}
+# chemin d'accès à la racine de rvsh
+ROOT="$HOME/rvsh"
 
-function add-user {
-
-    if [ ! -d /home/rvsh/user/$1 ]
-    then 
-        mkdir /home/rvsh/user/$1
-        echo -e "${White}The user $1 has been added.$NC"
+user_list() {
+    
+    list=$(ls $ROOT/users/)
+    if [ -z "$list" ]; then
+        echo "No users created"
     else
-        echo -e "${White}The user $1 already exist.$NC"
+        echo "$list"
     fi
 }
 
-function del-user {
+add_user() {
+
+    if [ ! -d $ROOT/users/$1 ]
+    then 
+        mkdir $ROOT/users/$1
+        echo -e "The user $1 has been added."
+    else
+        echo -e "The user $1 already exist."
+    fi
+}
+
+del_user() {
 
     
-    if [ -d /home/rvsh/user/$1 ]
+    if [ -d $ROOT/users/$1 ]
     then 
-        rmdir /home/rvsh/user/$1
-        echo -e "${White}The user $1 has been removed.$NC"
+        rmdir $ROOT/users/$1
+        echo -e "The user $1 has been removed."
     else
-        echo -e "${White}The user $1 doesn't exist.$NC"
+        echo -e "The user $1 doesn't exist."
     fi
 
 }
 
-function change_password {
+change_password() {
 
     local pass=""
     
@@ -37,49 +44,33 @@ function change_password {
         read -p "Enter the new password for $1 : " pass
     done
     
-    echo "$pass" | md5sum | cut -d ' ' -f1 > /home/rvsh/user/$1/password
+    echo "$pass" | md5sum | cut -d ' ' -f1 > $ROOT/users/$1/password
 
 }
 
+help_users() {
 
-function user_config {
-    
-    local username=$1
-    local user_config_prompt="${RED}rvsh config-$1>${NC}"
-    local cmd=""
-    
-    while [ ! \( "$cmd" = "q" -o "$cmd" = "quit" \) ]
-    do
-        echo -en "$user_config_prompt "
-        read tmp
-        cmd=($tmp)
-        cmd=${cmd[0]}
-        param=${tmp:${#cmd}}
-        
-        case $cmd in
-            "password" ) change_password $param;;
-        esac
-    done
-
+    echo "usage: users [-arlh]"
+    echo ""
+    echo "  -h    show this help and quit"
+    echo "  -a    add user"
+    echo "  -r    remove user"
+    echo "  -l    list all users"
+    echo ""
 }
 
-function user {
+users() {
 
-    if [ ! -d /home/rvsh/user ]
-    then 
-        mkdir /home/rvsh/user
-    fi
-    
     local OPTIND
     
     getopts "a:r:c:lh" OPTION
     
-    
     case "$OPTION" in
-        "a" ) add-user $OPTARG;;
-        "r" ) del-user $OPTARG;;
+        "a" ) add_user $OPTARG;;
+        "r" ) del_user $OPTARG;;
         "c" ) user_config $OPTARG;;
-        "l" ) user-list;;
-        "h" ) echo "aide";;
+        "l" ) user_list;;
+        "h" ) help_users;;
+        * ) help_users;;
     esac
 }

@@ -3,7 +3,7 @@ ROOT="$HOME/rvsh"
 
 host_list() {
     
-    list=$(ls -Al $ROOT/host/ | awk 'NR > 1 {print $NF}')
+    list=$(ls $ROOT/host/)
     if [ -z "$list" ]; then
         echo "No VMs created"
     else
@@ -50,15 +50,14 @@ host() {
     
     local OPTIND
     
-    while getopts "a:r:lh" opt; do
-    
-        case "$opt" in
-            "a" ) add_host $OPTARG;;
-            "r" ) del_host $OPTARG;;
-            "l" ) host_list;;
-            "h" ) help_host;;
-             *) help_host;;
-        esac
+    getopts "a:r:lh" opt
 
-    done
+    case "$opt" in
+        "a" ) add_host $OPTARG;;
+        "r" ) del_host $OPTARG;;
+        "l" ) host_list;;
+        "h" ) help_host;;
+         *) help_host;;
+    esac
+
 }
