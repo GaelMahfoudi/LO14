@@ -17,6 +17,8 @@ add_user() {
     then 
         mkdir $ROOT/users/$1
         echo -e "The user $1 has been added."
+        touch $ROOT/users/$1/password
+        touch $ROOT/users/$1/hostlist
     else
         echo -e "The user $1 already exist."
     fi
@@ -27,7 +29,7 @@ del_user() {
     
     if [ -d $ROOT/users/$1 ]
     then 
-        rmdir $ROOT/users/$1
+        rm -r $ROOT/users/$1
         echo -e "The user $1 has been removed."
     else
         echo -e "The user $1 doesn't exist."
@@ -50,8 +52,8 @@ change_password() {
 
 change_name() {
     
-    local userpath="home/rvsh/user/"
     local username=$1
+    
     local newname=""
     
     while [ "$newname" = "" ]
@@ -61,9 +63,9 @@ change_name() {
     
     
     
-    mkdir $ROOT/users/$new
-    cp -r $ROOT/users/$old/* $ROOT/users/$new
-    rm -r $ROOT/users/$old
+    mkdir $ROOT/users/$newname
+    cp -r $ROOT/users/$username/* $ROOT/users/$newname
+    rm -r $ROOT/users/$username
     
 }
 
