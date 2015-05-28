@@ -41,25 +41,30 @@ function change_password {
 
 }
 
-
-function user_config {
+function change_name {
     
+    local userpath="home/rvsh/user/"
     local username=$1
-    local user_config_prompt="${RED}rvsh config-$1>${NC}"
-    local cmd=""
+    local newname=""
     
-    while [ ! \( "$cmd" = "q" -o "$cmd" = "quit" \) ]
+    while [ "$newname" = "" ]
     do
-        echo -en "$user_config_prompt "
-        read tmp
-        cmd=($tmp)
-        cmd=${cmd[0]}
-        param=${tmp:${#cmd}}
-        
-        case $cmd in
-            "password" ) change_password $param;;
-        esac
+        read -p "Enter the new name for $username: " newname
     done
+    
+    
+    
+    mkdir $userpath$new
+    cp -r $userpath$old/* $userpath$new
+    rm -r $userpath$old
+    
+}
+
+function add_access_host {
+
+    local userpath="home/rvsh/user/"
+    local newhost=$1
+    echo -e "$1\n" >> $userpath/hostlist
 
 }
 
@@ -72,13 +77,14 @@ function user {
     
     local OPTIND
     
-    getopts "a:r:c:lh" OPTION
+    getopts "a:r:p:n:m:lh" OPTION
     
     
     case "$OPTION" in
         "a" ) add-user $OPTARG;;
         "r" ) del-user $OPTARG;;
-        "c" ) user_config $OPTARG;;
+        "p" ) change_password $OPTARG;;
+        "n" ) change_name $OPTARG;;
         "l" ) user-list;;
         "h" ) echo "aide";;
     esac
