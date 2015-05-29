@@ -30,6 +30,8 @@ print_msg() {
 # $1 : Nom de l'utilisateur
 check_msg() {
 
+	if [ ! -d $ROOT/users/$1/msg/ ]
+
 	local msgList=$(ls $ROOT/users/$1/msg/)
 	local msgCount=($msgList)
 
