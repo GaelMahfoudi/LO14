@@ -5,6 +5,8 @@
 
 ROOT="$HOME/rvsh"
 
+YELLOW='\e[0;33m'       # Yellow
+NC='\e[0m'       # Text Reset
 
 
 
@@ -13,15 +15,17 @@ ROOT="$HOME/rvsh"
 
 print_msg() {
 
-	local msgList=$(ls $ROOT/users/$1/msg/)
+	local msgList=$(ls $ROOT/users/$1/msg)
 	local msgCount=($msgList)
 
 	local msg=""
-	for i in $msgCount
+	for i in $(ls $ROOT/users/$1/msg)
 	do
-		echo -n "Message from $i : "
+		name=$(echo $i | awk -F "." '{print $1}')
+		echo -en "${YELLOW}Message from $name : $NC"
 		msg=$(cat $ROOT/users/$1/msg/$i)
 		echo -e "$msg"
+		rm $ROOT/users/$1/msg/$i
 	done
 
 }
@@ -31,16 +35,17 @@ print_msg() {
 check_msg() {
 
 	if [ ! -d $ROOT/users/$1/msg/ ]
+	then
+		mkdir $ROOT/users/$1/msg/
+	fi
 
-	local msgList=$(ls $ROOT/users/$1/msg/)
+	local msgList=$(ls $ROOT/users/$1/msg)
 	local msgCount=($msgList)
 
-	if [ "$msgList" = "" ]
+	if [ "$msgList" != "" ]
 	then
-		echo "No new messages"
-	else
-		echo "You have ${msgCount[@]} new messages"
-		print_msg
+		echo -e "You have $YELLOW${#msgCount[@]}$NC new messages : "
+		print_msg $1
 	fi
 }
 

@@ -17,6 +17,8 @@ source rhost.sh
 
 source sources/sbin/host.sh
 source sources/sbin/users.sh
+source sources/bin/write.sh
+source sources/bin/msg.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -162,6 +164,10 @@ handle_users_cmd() {
         cmd=${cmd[0]}
         param=${tmp:${#cmd}}
 
+
+
+        check_msg $username
+
         # lecture de la commande entree
         case "$cmd" in
 
@@ -202,7 +208,7 @@ handle_users_cmd() {
             ;;
 
         'write')
-            echo "[*] commande en dev..."
+            write "$param" "$username"
             ;;
 
         '')
