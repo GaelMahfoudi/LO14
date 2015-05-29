@@ -108,6 +108,8 @@ help_users() {
     echo ""
 }
 
+#Le best easter egg de notre projet <3
+
 users() {
 
     local OPTIND
