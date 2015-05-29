@@ -35,10 +35,10 @@ help_host() {
 
     echo "usage: host [-arlh]"
     echo ""
-    echo "  -h    show this help and quit"
-    echo "  -a    add a VM"
-    echo "  -r    remove a VM"
-    echo "  -l    list all VM"
+    echo "  -h        show this help and quit"
+    echo "  -l        list all VM"
+    echo "  -a  <vm>  add a VM"
+    echo "  -r  <vm>  remove a VM"
     echo ""
 }
 

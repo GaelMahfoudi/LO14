@@ -45,13 +45,22 @@ change_password() {
 
     local pass=""
     
-    while [ "$pass" = "" ]
-    do
-        read -p "Enter the new password for $1 : " pass
-    done
-    
-    echo "$pass" | md5sum | cut -d ' ' -f1 > $ROOT/users/$1/password
+    if [ -d $ROOT/users/$1 ]
+    then
 
+        while [ "$pass" = "" ]
+        do
+            read -p "Enter the new password for $1 : " -s pass
+            echo ""
+        done
+        
+        echo "$pass" | md5sum | cut -d ' ' -f1 > $ROOT/users/$1/password
+
+    else
+
+        echo "User $1 does not exists"
+
+    fi
 }
 
 change_name() {
@@ -59,21 +68,28 @@ change_name() {
     
     if [ ! "$1" = "admin" ]
     then
-        local username=$1
-    
-        local newname=""
-    
-        while [ "$newname" = "" ]
-        do
-            read -p "Enter the new name for $username: " newname
-        done
-    
-    
-    
-        mkdir $ROOT/users/$newname
-        cp -r $ROOT/users/$username/* $ROOT/users/$newname
-        rm -r $ROOT/users/$username
-    
+        if [ -d $ROOT/users/$1 ]
+        then
+
+            local username=$1
+        
+            local newname=""
+        
+            while [ "$newname" = "" ]
+            do
+                read -p "Enter the new name for $username: " newname
+            done
+        
+        
+            mkdir $ROOT/users/$newname
+            cp -r $ROOT/users/$username/* $ROOT/users/$newname
+            rm -r $ROOT/users/$username
+        else
+
+            echo "User $1 does not exist"
+
+        fi
+
     else
         echo "You can't rename the administrator"
     fi
@@ -101,10 +117,13 @@ help_users() {
 
     echo "usage: users [-arlh]"
     echo ""
-    echo "  -h    show this help and quit"
-    echo "  -a    add user"
-    echo "  -r    remove user"
-    echo "  -l    list all users"
+    echo "  -l         list all users"
+    echo "  -h         show this help and quit"
+    echo "  -a <usr>   add user"
+    echo "  -r <usr>   remove user"
+    echo "  -p <usr>   change user password"
+    echo "  -n <usr>   change user name"
+    echo "  -m <usr>   change user access list"
     echo ""
 }
 

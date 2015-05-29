@@ -7,7 +7,13 @@
 # bash_version  : 4.3.X-release
 #---------------------------------------------------
 
+# utils
+source handle_connections.sh
 
+# users bin
+source connect.sh
+source passwd.sh
+source rhost.sh
 
 source sources/sbin/host.sh
 source sources/sbin/users.sh
@@ -40,22 +46,8 @@ BWHIHTE='\e[1;37m'      # White
 ROOT="$HOME/rvsh"
 
 
-####################################################
-#
-# FUNCTIONS
-#
-####################################################
 
-
-
-# 'build_help'
-#   constuit les fichier les fichiers d'aide principal de `rvsh.sh`
-#   l'aide est accessible via `?` dans le prompt
-#   construit 2 fichier:
-#       admincmd: pour les commandes aministrateur
-#       userscmd: pour les commandes utilisateur
-#
-function make_help {
+make_help() {
 
     # admincmd
     echo 'Aide des commandes administrateur (tapez <cmd> -h pour plus de precrisions)
@@ -79,11 +71,7 @@ write: envoi un message a un utilisateur connecte' > $ROOT/.help/userscmd
 }
 
 
-# 'install'
-#   fonction d'installation du programme
-#   rvsh.sh
-#
-function install {
+install() {
 
     declare -a directories
     directories[0]='host'               # dossier des VMs
@@ -116,43 +104,30 @@ function install {
     
     make_help
     
-    # admin password creation
+    echo "install> root account configuration..." # admin password creation
     touch $ROOT/users/admin/password
     echo "6f55b656e660c72e2e38b8a68c598703" > $ROOT/users/admin/password     
+
+    echo "install> guest account configuration..."
+    mkdir $ROOT/users/guest
+    mkdir $ROOT/host/guest
+    touch $ROOT/users/guest/password
+    touch $ROOT/users/guest/hostlist && echo -e "guest\n" > $ROOT/users/guest/hostlist
+
 
     echo -e "install> Done."
 }
 
 
-# 'uninstall'
-#   fonction de desinstallation du programme
-#   rvsh.sh
-#
-function uninstall {
-
-
-    if [ "$(whoami)" != "root" ]
-    then
-
-        echo "[error] uninstalling $(basename $0): you must be root..."
-        exit
-
-    else
-
-        echo "[*] uninstall $(basename $0)..."
-        # userdel rvsh         # suppression de l'utilisateur
-        # groupdel rvsh        # suppression du groupe
-        rm -r $ROOT        # suppression de l'architecture personnelle
-        
-    fi
-
+uninstall() {
+    echo "[*] uninstall $(basename $0)..."
+    # userdel rvsh         # suppression de l'utilisateur
+    # groupdel rvsh        # suppression du groupe
+    rm -r $ROOT        # suppression de l'architecture personnelle
     exit
 }
 
 
-# 'usage'
-#   affiche l'aide de la commande `rvsh.sh`
-#
 usage() {
 
     echo "Usage: $(basename $0) [--admin | --connect <hostname> <username>]"
@@ -170,93 +145,87 @@ usage() {
 }
 
 
-password() {
+
+handle_users_cmd() {
+
 
     local username="$1"
     local hostname="$2"
-
-
-    if [ -e $ROOT/users/$username/password ]; then
-
-        read -p "[CONNECTION] password for $username : " -s pass
-        userpass=$(cat $ROOT/users/$username/password)
-
-
-        if [ "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ]; then
-            echo -e "\n[*] you are now logged as $username on $hostname\n"
-            return 0  # success
-        else
-            echo -e "\n[!] bad password for user $username on $hostname\n"
-            return 1 # fail
-        fi
+    local cmd=""    # commande entree par l'utilisateur
+    local user_prompt="${BGREEN}${username}${BWHIHTE}@${BGREEN}${hostname} >${NC}"
     
-    fi
+    while [ "$cmd" != "quit" ]
+    do
+        echo -en "$user_prompt "
+        read tmp
+        cmd=($tmp)
+        cmd=${cmd[0]}
+        param=${tmp:${#cmd}}
 
-    #=== NOTE ===============================
-    # gerer le cas ou le fichier password
-    # n'existe pas
-    #========================================
+        # lecture de la commande entree
+        case "$cmd" in
+
+        'quit' | 'q')
+            write_logs "$username" "$hostname" "disconnected"
+            return
+            ;;
+
+        'clear' | 'c')
+            clear
+            ;;
+
+        'who')
+            echo "[*] commande en dev..."
+            ;;
+
+        'rusers')
+            echo "[*] commande en dev..."
+            ;;
+        'rhost')
+            rhost
+            ;;
+
+        'connect') #moi
+            connect_to_vm $username $param
+            ;;
+
+        'su') # moi
+            echo "[*] commande en dev..."
+            ;;
+
+        'passwd') 
+            echo "[*] commande en dev..."            
+            ;;
+
+        'finger')
+            echo "[*] commande en dev..."
+            ;;
+
+        'write')
+            echo "[*] commande en dev..."
+            ;;
+
+        '')
+            continue
+            ;;
+
+        '?') 
+            help_cmd "user"
+            ;;
+
+        *) 
+            echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
+            ;;
+        esac
+
+   done
 }
 
 
-connect() {
-    
-    local username="$1"
-    local hostname="$2"
-
-
-    # si connexion en mode admin
-    password "$username"  "$hostname"
-
-    if [ $? -eq 0 ]; then
-    
-        write_logs $username $hostname "connected"
-    
-        if [ "$username" = "admin" ]; then
-            handle_admin_cmd
-        else
-            handle_users_cmd $username $hostname
-        fi
-    
-        write_logs $username $hostname "disconnected"
-    
-    else
-        return 
-    fi
-}
-
-
-#
-# DOCUMENTATION write_logs
-# le mode signifie si c'est une deconnexion ou un connexion
-#
-write_logs() {
-
-    local username="$1"
-    local hostname="$2"
-    local message="$3"
-
-    local rep_log=$(date +%F) # nom du dossier de log
-    local prompt_log=$(date | awk '{printf "%s %s %s %s %s",  substr($1,0, 4), $2, $3, $4, $5}' | sed 's/,/ --/')
-    
-
-    # si le dossier de log n'existe pas, on le cree
-    if [ ! -d $ROOT/.log/$rep_log ]
-    then
-        mkdir -p $ROOT/.log/$rep_log
-    fi
-    
-    echo -e "${prompt_log} >  $username @ $hostname: $message" >> $ROOT/.log/$rep_log/syslogs
-} 
-
-
-#
-# DOCUMENTATION handle_admin_cmd
-#
 handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
-    local admin_prompt="${RED}rvsh >${NC}"
+    local admin_prompt="${BRED}rvsh >${NC}"
     
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
         echo -en "$admin_prompt "
@@ -270,122 +239,44 @@ handle_admin_cmd() {
         # lecture de la commande entree
         case "$cmd" in
 
-            'quit' | 'q')
-                ;;
+        'quit' | 'q')
+            write_logs "admin" "rvsh" "disconnected"
+            return
+            ;;
 
-            'clear' | 'c')
-                clear
-                ;;
+        'clear' | 'c')
+            clear
+            ;;
 
-            'afinger')
-                echo "[*] commande en dev..."
-                ;;
+        'afinger')
+            echo "[*] commande en dev..."
+            ;;
 
-            'host')
-                host $param
-                ;;
-            'users')
-            
-                users $param
-                ;;
-            
-            '')
-                continue
-                ;;
-
-            '?') 
-                help_cmd "admin"
-                ;;
-
-            *) 
-                echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
-                ;;
-        esac
-    
-   done
-}
-
-
-#
-# DOCUMENTATION handle_admin_cmd
-#
-function handle_users_cmd {
-
-
-    local username="$1"
-    local hostname="$2"
-    local cmd=""    # commande entree par l'utilisateur
-    local user_prompt="${GREEN}${username}@${hostname} >${NC}"
-    
-    while [ "$cmd" != "quit" ]
-    do
-        echo -en "$user_prompt "
-        read cmd
+        'host')
+            host $param
+            ;;
+        'users')
         
-        # lecture de la commande entree
-        case "$cmd" in
+            users $param
+            ;;
+        
+        '')
+            continue
+            ;;
 
-            'quit') 
-                
-                ;;
+        '?') 
+            help_cmd "admin"
+            ;;
 
-            'clear')
-                clear
-                ;;
-
-            'who')
-                echo "[*] commande en dev..."
-                ;;
-
-            'rusers')
-                echo "[*] commande en dev..."
-                ;;
-            'rhost')
-                echo "[*] commande en dev..."
-                ;;
-
-            'connect')
-                echo "[*] commande en dev..."
-                ;;
-
-            'su')
-                echo "[*] commande en dev..."
-                ;;
-
-            'passwd')
-                echo "[*] commande en dev..."
-                ;;
-
-            'finger')
-                echo "[*] commande en dev..."
-                ;;
-
-            'write')
-                echo "[*] commande en dev..."
-                ;;
-
-            '')
-                continue
-                ;;
-
-            '?') 
-                help_cmd "user"
-                ;;
-
-            *) 
-                echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
-                ;;
+        *) 
+            echo -e "${YELLOW}$cmd : Commande non reconnue, '?' pour afficher les commandes disponnibles${NC}"
+            ;;
         esac
-
+    
    done
 }
 
 
-
-
-
-# 'help_cmd'
-# 
 help_cmd() {
 
     local mode="$1"
@@ -438,52 +329,52 @@ main() {
         
         case "$1" in
                 
-            -h | --help)
-            shift
-            usage
-            ;;
-                
-                
-            -a | --admin)
-            shift
-            admin_flag="on"
+        -h | --help)
+        shift
+        usage
+        ;;
             
-            break
-            ;;
-                
-            -c | --connect)
-            shift
-            user_flag="on"
-            hostname="$1"
-            shift 2
-
-            if [ -z "$1" ] 
-            then
-                echo "Vous devez preciser le nom d'utilisateur..."
-                exit
-            else
-                username="$1"
-            fi 
             
-            break
-            ;;
-                
+        -a | --admin)
+        shift
+        admin_flag="on"
+        
+        break
+        ;;
+            
+        -c | --connect)
+        shift
+        user_flag="on"
+        hostname="$1"
+        shift 2
 
-            -i | --install)
-            install
-            break
-            ;;
+        if [ -z "$1" ] 
+        then
+            echo "Vous devez preciser le nom d'utilisateur..."
+            exit
+        else
+            username="$1"
+        fi 
+        
+        break
+        ;;
+            
 
-            -u | --uninstall)
-            uninstall
-            break
-            ;;
+        -i | --install)
+        install
+        break
+        ;;
+
+        -u | --uninstall)
+        uninstall
+        break
+        ;;
 
 
-            --)
-            shift;
-            break;
-            ;;
+        --)
+        shift;
+        break;
+        ;;
 
         esac
 
@@ -494,11 +385,15 @@ main() {
     #
     if [ "$admin_flag" = "on" ]; then
         
-        connect "admin" "rvsh"
+        connect "admin" "rvsh" && \
+        write_logs "admin" "rvsh" "connected" &&\
+        handle_admin_cmd 
 
     elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
 
-        connect "$username" "$hostname"
+        connect "$username" "$hostname" && \
+        write_logs "$username" "$hostname" "connected" && \
+        handle_users_cmd "$username" "$hostname"
 
     else
 
