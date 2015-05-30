@@ -9,6 +9,7 @@ authentification() {
             
         # si l'utilisateur a un password
         read -p "[CONNECTION] password for $username : " -s pass
+        echo ""
         [ ! "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ] && return 1 || return 0
 
     else
@@ -68,7 +69,7 @@ connect() {
 
     if [ $? -eq 0 ]; then
         
-        echo -e "\n[*] you are now logged as $username on $hostname."
+        echo -e "[*] you are now logged as $username on $hostname."
         return 0
 
     else

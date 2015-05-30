@@ -14,6 +14,8 @@ source handle_connections.sh
 source connect.sh
 source passwd.sh
 source rhost.sh
+source su.sh
+source passwd.sh
 
 source sources/sbin/host.sh
 source sources/sbin/users.sh
@@ -185,16 +187,16 @@ handle_users_cmd() {
             rhost
             ;;
 
-        'connect') #moi
+        'connect') 
             connect_to_vm $username $param
             ;;
 
-        'su') # moi
-            echo "[*] commande en dev..."
+        'su') 
+            switch_user $hostname $param 
             ;;
 
         'passwd') 
-            echo "[*] commande en dev..."            
+            change_users_passwd $username
             ;;
 
         'finger')
