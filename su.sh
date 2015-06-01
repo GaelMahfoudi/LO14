@@ -1,5 +1,31 @@
-# chemin d'accès à la racine de rvsh
+#===================================================================================
+# file         : su.sh
+# usage        : ---
+#
+# description  : fichier source de la commande su.
+#
+# options      : ---
+# authors      : G. MAHFOUDI & S. JUHEL
+# company      : UTT
+# version      : 1.0
+# bugs         : ---
+# notes        : ---
+# created      : ---
+# revision     : ---
+#===================================================================================
+
+
+#=== includes ======================================================================
+
+source handle_connections.sh
+
+#=== end includes ================================================================== 
+
+
+# repertoire racine de rvsh
 ROOT="$HOME/rvsh"
+
+
 
 help_switch_user() {
 
