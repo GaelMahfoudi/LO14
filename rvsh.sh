@@ -18,13 +18,14 @@ source su.sh
 source passwd.sh
 source who.sh
 source rusers.sh
+source write.sh
+source msg.sh
+source finger.sh
 
-source sources/sbin/host.sh
-source sources/sbin/users.sh
-source sources/sbin/afinger.sh
-source sources/bin/write.sh
-source sources/bin/msg.sh
-source sources/bin/finger.sh
+
+source host.sh
+source users.sh
+source afinger.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
