@@ -26,7 +26,12 @@ source handle_connections.sh
 ROOT="$HOME/rvsh"
 
 
-
+#=== function ======================================================================
+# name         : help_switch_user
+# description  : affiche l'aide en ligne de la commande `switch_user'
+# 
+# parameters   : ---
+#===================================================================================
 help_switch_user() {
 
 	echo "usage: su <user>"
@@ -34,26 +39,36 @@ help_switch_user() {
 
 }
 
+#=== function ======================================================================
+# name         : switch_user
+# description  : permet de changer d'utilisateur
+#
+# parameters   :
+# $1 - le nom du nouvel utilisateur
+# $2 - le nom de la machine courante
+#===================================================================================
 switch_user() {
 
-	# attention à l'inversion
 	local hostname="$1"
 	local username="$2"
 
 
+	# si aucun paramètres n'est envoyé à la commande
 	if [ -z $username ]; then
 
-		# si pas d'argument
 		help_switch_user
 
+	# si l'utilisateur entré n'existe pas
 	elif [ ! -d $ROOT/users/$username ]; then
 
-		# si l'utilisateur n'existe
-		echo "Error: can not connect as $username; user unknown"
+		echo "Error: can not connect as $username user unknown"
 
+	# sinon
 	else
-		connect "$username" "$hostname" && \
-        write_logs "$username" "$hostname" "connected" && \
-        handle_users_cmd "$username" "$hostname" "$(date +%T)"
+
+		connect "$username" "$hostname" && \						# on se connecte en tant que nouvel utilisateur sur la meme machine
+        write_logs "$username" "$hostname" "connected" && \			# puis on ecrit les logs de connexion
+        handle_users_cmd "$username" "$hostname" "$(date +%T)"		# puis on gère la nouvelle ligne de commande
+    
     fi
 }
