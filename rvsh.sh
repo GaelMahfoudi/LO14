@@ -14,13 +14,18 @@ source handle_connections.sh
 source connect.sh
 source passwd.sh
 source rhost.sh
+source su.sh
+source passwd.sh
+source who.sh
+source rusers.sh
+source write.sh
+source msg.sh
+source finger.sh
 
-source sources/sbin/host.sh
-source sources/sbin/users.sh
-source sources/sbin/afinger.sh
-source sources/bin/write.sh
-source sources/bin/msg.sh
-source sources/bin/finger.sh
+
+source host.sh
+source users.sh
+source afinger.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -155,6 +160,7 @@ handle_users_cmd() {
 
     local username="$1"
     local hostname="$2"
+    local ctime="$3"
     local cmd=""    # commande entree par l'utilisateur
     local user_prompt="${BGREEN}${username}${BWHIHTE}@${BGREEN}${hostname} >${NC}"
     
@@ -174,7 +180,7 @@ handle_users_cmd() {
         case "$cmd" in
 
         'quit' | 'q')
-            write_logs "$username" "$hostname" "disconnected"
+            disconnect "$username" "$hostname" "$ctime"
             return
             ;;
 
@@ -183,26 +189,26 @@ handle_users_cmd() {
             ;;
 
         'who')
-            echo "[*] commande en dev..."
+            who_is_connected_on $hostname            
             ;;
 
         'rusers')
-            echo "[*] commande en dev..."
+            rusers
             ;;
         'rhost')
             rhost
             ;;
 
-        'connect') #moi
+        'connect') 
             connect_to_vm $username $param
             ;;
 
-        'su') # moi
-            echo "[*] commande en dev..."
+        'su') 
+            switch_user $hostname $param 
             ;;
 
         'passwd') 
-            echo "[*] commande en dev..."            
+            change_users_passwd $username
             ;;
 
         'finger')
@@ -248,7 +254,7 @@ handle_admin_cmd() {
         case "$cmd" in
 
         'quit' | 'q')
-            write_logs "admin" "rvsh" "disconnected"
+            disconnect "admin" "rvsh"
             return
             ;;
 
@@ -401,7 +407,7 @@ main() {
 
         connect "$username" "$hostname" && \
         write_logs "$username" "$hostname" "connected" && \
-        handle_users_cmd "$username" "$hostname"
+        handle_users_cmd "$username" "$hostname" "$(date +%T)"
 
     else
 

@@ -18,18 +18,21 @@ change_users_passwd() {
 	if [ ! -z "$old_pass" ]; then
 
 		read -p "(current) password: " -s curr_pass
-		
-		[ "$(echo "$curr_pass" | md5sum | cut -d' ' -f1 )" = "$old_pass" ] || \
-		(echo -e "\n\n[passwd] error while entering new password\n[passwd] password unchanged for $username"; return)
-	
+		echo ""
+
+		if [ "$(echo "$curr_pass" | md5sum | cut -d' ' -f1 )" != "$old_pass" ]; then
+			echo "[passwd] error while entering new password"
+			echo "[passwd] password unchanged for $username"
+			return
+		fi
 	fi
 
 	
 	# on lui demande son nouveau mot de passe 
 	read -p "(new) password: " -s new_pass
-
+	echo ""
 	# on update le fichier password de l'utilisateur
-	echo "$(echo "$curr_pass" | md5sum | cut -d' ' -f1)" > $ROOT/users/$username/password
+	echo "$(echo "$new_pass" | md5sum | cut -d' ' -f1)" > $ROOT/users/$username/password
 	echo "[passwd] password updated succesfully for $username"
 	
 }
