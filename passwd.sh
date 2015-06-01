@@ -1,38 +1,67 @@
-# dossier racine de rvsh
+#===================================================================================
+# file         : passwd.sh
+# usage        : ---
+#
+# description  : fichier source de la commande passwd.
+#
+# options      : ---
+# authors      : G. MAHFOUDI & S. JUHEL
+# company      : UTT
+# version      : 1.0
+# bugs         : ---
+# notes        : ---
+# created      : ---
+# revision     : ---
+#===================================================================================
+
+
+# repertoire racine de rvsh
 ROOT="$HOME/rvsh"
 
+
+#=== function ======================================================================
+# name         : change_users_passwd
+# description  : permet à l'utilisateur de changer de mot de passe sur l'ensemble
+#       		 du réseau virtuel 
+# 
+# parameters   :
+# $1 - le nom de l'utilisateur qui désire changer son mot de passe
+#===================================================================================
 change_users_passwd() {
 
-	local username="$1" 	# on recupere l'utilisateur qui veux changer son mot de passe
+	local username="$1" 										# utilisateur qui veux changer son mot de passe
+	local old_pass="$(cat $ROOT/users/$username/password)" 		# ancien mot de passe de l'utilisateur
+	local new_pass=""											# nouveau mot de passe
+	local curr_pass=""											# le mot de passe courant de l'utiliateur (pour la verifcation du bon mdp)			
 
 
-	# l'utilisateur voulant changer son password existe
-	local old_pass="$(cat $ROOT/users/$username/password)"
-	local new_pass=""
-	local curr_pass=""
+	echo "Changing password for $username"
 
-
-	echo "[passwd] Changing password for $username"
-
-	# si l'utilisateur possede un password
+	# cas où l'utilisateur possède un mot de passe
 	if [ ! -z "$old_pass" ]; then
 
+		# on lui demande d'entrer son mot de passe actuel
 		read -p "(current) password: " -s curr_pass
 		echo ""
 
+		# si le mot de passe entre est different 
+		# de celui qu'il possède on quitte la fonction
 		if [ "$(echo "$curr_pass" | md5sum | cut -d' ' -f1 )" != "$old_pass" ]; then
-			echo "[passwd] error while entering new password"
-			echo "[passwd] password unchanged for $username"
+			echo "Error while entering new password"
+			echo "Password unchanged for $username"
 			return
 		fi
 	fi
 
 	
-	# on lui demande son nouveau mot de passe 
+	# cas où l'utilisateur ne possède pas de mot de passe
+	# ou cas où il a saisi le bon mot de passe actuel
+	# on lit le nouveau mot de passe 
 	read -p "(new) password: " -s new_pass
 	echo ""
+	
 	# on update le fichier password de l'utilisateur
 	echo "$(echo "$new_pass" | md5sum | cut -d' ' -f1)" > $ROOT/users/$username/password
-	echo "[passwd] password updated succesfully for $username"
+	echo "Password updated succesfully for $username"
 	
 }
