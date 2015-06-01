@@ -17,8 +17,10 @@ source rhost.sh
 
 source sources/sbin/host.sh
 source sources/sbin/users.sh
+source sources/sbin/afinger.sh
 source sources/bin/write.sh
 source sources/bin/msg.sh
+source sources/bin/finger.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -204,7 +206,7 @@ handle_users_cmd() {
             ;;
 
         'finger')
-            echo "[*] commande en dev..."
+            finger $param
             ;;
 
         'write')
@@ -255,7 +257,7 @@ handle_admin_cmd() {
             ;;
 
         'afinger')
-            echo "[*] commande en dev..."
+            afinger $param
             ;;
 
         'host')

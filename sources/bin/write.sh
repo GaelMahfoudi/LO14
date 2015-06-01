@@ -22,14 +22,8 @@ write() {
 	then
 		mkdir $ROOT/users/$cible/msg/
 	fi
-
 	
-
-	echo
-
-
 	sender="$2.$(date +%H%M%N)"
-
 	echo -e $msg > $ROOT/users/$cible/msg/$sender
 
 }
