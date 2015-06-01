@@ -21,6 +21,10 @@ source rusers.sh
 
 source sources/sbin/host.sh
 source sources/sbin/users.sh
+source sources/sbin/afinger.sh
+source sources/bin/write.sh
+source sources/bin/msg.sh
+source sources/bin/finger.sh
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -167,6 +171,10 @@ handle_users_cmd() {
         cmd=${cmd[0]}
         param=${tmp:${#cmd}}
 
+
+
+        check_msg $username
+
         # lecture de la commande entree
         case "$cmd" in
 
@@ -203,11 +211,11 @@ handle_users_cmd() {
             ;;
 
         'finger')
-            echo "[*] commande en dev..."
+            finger $param
             ;;
 
         'write')
-            echo "[*] commande en dev..."
+            write "$param" "$username"
             ;;
 
         '')
@@ -254,7 +262,7 @@ handle_admin_cmd() {
             ;;
 
         'afinger')
-            echo "[*] commande en dev..."
+            afinger $param
             ;;
 
         'host')
