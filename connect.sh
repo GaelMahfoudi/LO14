@@ -21,7 +21,7 @@ connect_to_vm() {
     else
         connect "$username" "$new_vm" && \
         write_logs "$username" "$new_vm" "connected" &&\
-        handle_users_cmd "$username" "$new_vm"
+        handle_users_cmd "$username" "$new_vm" "$(date +%T)"
     fi
 
 }

@@ -28,6 +28,6 @@ switch_user() {
 	else
 		connect "$username" "$hostname" && \
         write_logs "$username" "$hostname" "connected" && \
-        handle_users_cmd "$username" "$hostname"
+        handle_users_cmd "$username" "$hostname" "$(date +%T)"
     fi
 }

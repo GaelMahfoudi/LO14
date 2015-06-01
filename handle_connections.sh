@@ -37,25 +37,58 @@ write_logs() {
 } 
 
 
+push_user_connexion() {
+
+    local username="$1"
+    local hostname="$2"
+
+    if [ "$username" != "admin" ]; then
+        touch $ROOT/host/$hostname/$username.tmp
+        echo "$username,$(date +%T),$(date +%D)" >> $ROOT/host/$hostname/$username.tmp
+    fi
+}
+
+
+pop_user_connexion() {
+
+    local username="$1"
+    local hostname="$2"
+    local ctime="$3"
+
+    new_content=$(cat $ROOT/host/$hostname/$username.tmp | sed /$ctime/d)
+
+    if [ -s $new_content ]; then
+        rm $ROOT/host/$hostname/$username.tmp
+    else
+        echo "$new_content" > $ROOT/host/$hostname/$username.tmp
+    fi
+}
+
+
 connect() {
     
     local username="$1"
     local hostname="$2"
-    
+
 
     if [ "$username" = "admin" ]; then
 
         # connexion de l'administrateur
-
         authentification "$username"
 
     elif [ -d "$ROOT/users/$username" -a -d "$ROOT/host/$hostname" ]; then
 
         # connexion si la machine et l'utilisateur existe
 
-        # verifier les droits d'accès à une machine d'un utilisateur 
+        # verification des droits d acces
+        cat $ROOT/users/$username/hostlist | grep "$hostname"
 
-        authentification "$username"
+        if [ $? -eq 0 ]; then
+            authentification "$username"
+        else
+            echo "You can not connect $username on $hostname: permission denied"
+            return 1
+        fi
 
     else
 
@@ -70,6 +103,7 @@ connect() {
     if [ $? -eq 0 ]; then
         
         echo -e "[*] you are now logged as $username on $hostname."
+        push_user_connexion $username $hostname
         return 0
 
     else
@@ -80,3 +114,18 @@ connect() {
 }
 
 
+disconnect() {
+
+    local username="$1"
+    local hostname="$2"
+    local ctime="$3"
+
+    if [ "$username" != "admin" ]; then
+
+        pop_user_connexion $username $hostname $ctime
+    
+    fi
+    
+    write_logs "$username" "$hostname" "disconnected"
+
+}

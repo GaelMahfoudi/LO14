@@ -98,16 +98,26 @@ change_name() {
 
 add_access_host() {
 
-    if [ ! "$1" = "admin" ]
+    local user="$1"
+
+    if [ ! "$user" = "admin" ]
     then
-        local newhost=""
+        
+        newhost=""
     
         while [ "$newhost" = "" ]
         do
-            read -p "Enter the new accessible host for $1: " newname
+            read -p "Enter the new accessible host for $user: " newhost
+            if [ ! -d $ROOT/host/$newhost ]; then
+                echo "The host you entered does not exist"
+                newhost=""
+            fi
+
         done
-    
-        echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
+         
+        echo -e "$newhost" >> $ROOT/users/$user/hostlist
+        echo -e "hosts available for $user:\n$(cat $ROOT/users/$user/hostlist)"
+
     else
         echo "You can't add host to the administrator"
     fi
