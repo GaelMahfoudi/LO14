@@ -1,5 +1,33 @@
+#!/bin/bash
+
+
+# =====================================================================
+#
+#           FILE : users.sh
+#
+#          USAGE : users.sh [-arpnm user] [-lh]
+#
+#    DESCRIPTION : Allows the administrator to modify users information
+#                  such as the name, password etc ...
+#
+#
+#         OPTION : see help_users function
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+# =====================================================================
+
+
+
 # chemin d'accès à la racine de rvsh
 ROOT="$HOME/rvsh"
+
+
+
+# ====  USER_LIST  ====================================================
+#
+#        NAME : user_list
+# DESCRIPTION : List all the existing users.
+# PARAMETER   : No parameters.
+# =====================================================================
 
 user_list() {
     
@@ -10,6 +38,14 @@ user_list() {
         echo "$list"
     fi
 }
+
+
+# ====  ADD_USER  =====================================================
+#
+#        NAME : add_user
+# DESCRIPTION : Add a new user.
+# PARAMETER $1: Name of the new user.
+# =====================================================================
 
 add_user() {
 
@@ -23,6 +59,14 @@ add_user() {
         echo -e "The user $1 already exist."
     fi
 }
+
+
+# ====  DEL_USER  =====================================================
+#
+#        NAME : del_user
+# DESCRIPTION : Delete an existing user.
+# PARAMETER $1: Name of the user to delete.
+# =====================================================================
 
 del_user() {
 
@@ -40,6 +84,14 @@ del_user() {
     fi
 
 }
+
+
+# ====  CHANGE_PASSWORD  ==============================================
+#
+#        NAME : change_password
+# DESCRIPTION : Change the user password.
+# PARAMETER $1: The user who will see is password changed.
+# =====================================================================
 
 change_password() {
 
@@ -62,6 +114,14 @@ change_password() {
 
     fi
 }
+
+
+# ====  CHANGE_NAME  ==================================================
+#
+#        NAME : change_name
+# DESCRIPTION : Change the user name.
+# PARAMETER $1: The user who will see is name changed.
+# =====================================================================
 
 change_name() {
     
@@ -96,32 +156,38 @@ change_name() {
     
 }
 
+
+# ====  ADD_ACCESS_HOST  ==============================================
+#
+#        NAME : add_access_host
+# DESCRIPTION : Add access to the host specified to the user specified.
+# PARAMETER $1: The user who will have acces to the host.
+# =====================================================================
+
 add_access_host() {
 
-    local user="$1"
-
-    if [ ! "$user" = "admin" ]
+    if [ ! "$1" = "admin" ]
     then
-        
-        newhost=""
+        local newhost=""
     
         while [ "$newhost" = "" ]
         do
-            read -p "Enter the new accessible host for $user: " newhost
-            if [ ! -d $ROOT/host/$newhost ]; then
-                echo "The host you entered does not exist"
-                newhost=""
-            fi
-
+            read -p "Enter the new accessible host for $1: " newname
         done
-         
-        echo -e "$newhost" >> $ROOT/users/$user/hostlist
-        echo -e "hosts available for $user:\n$(cat $ROOT/users/$user/hostlist)"
-
+    
+        echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
     else
         echo "You can't add host to the administrator"
     fi
 }
+
+
+# ====  HELP_USERS  ===================================================
+#
+#        NAME : help_users
+# DESCRIPTION : Show the help for the function users
+# PARAMETER   : No parameters.
+# =====================================================================
 
 help_users() {
 
@@ -137,7 +203,16 @@ help_users() {
     echo ""
 }
 
-#Le best easter egg de notre projet <3
+
+
+
+# ====  USERS  ========================================================
+#
+#        NAME : users
+# DESCRIPTION : Core function. Parse the arguments and call the approp-
+#               riate function.
+# PARAMETER $1: Arguments list.
+# =====================================================================
 
 users() {
 

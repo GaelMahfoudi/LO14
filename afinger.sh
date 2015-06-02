@@ -32,10 +32,11 @@ function add_phone {
 			j=$(($j+1))
 		done
 
+        first="o"
 		choice=""
+        echo -e "\n"
 		while [ ! \( "$choice" = "add" -o "$choice" = "del" \) ]
 		do
-			echo -en "\r                                                                      \r"
             echo -en "Would you like to add or del one ? (add/del) : "
             read choice
 		done
