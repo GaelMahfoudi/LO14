@@ -1,13 +1,34 @@
 #!/bin/bash
 
-# Ecriture des messages pour d'autre utilisateurs
+# =====================================================================
+#
+#			FILE : write.sh
+#
+#		   USAGE : write.sh [user@vm] [Message to send]
+#
+#	 DESCRIPTION : Send a message to the user specify who is connected
+#				   on the specified virtual machine.
+#
+#
+#		  OPTION : see write_usage function
+#		  AUTHOR : Gaël Mahfoudi & Simon Juhel
+# =====================================================================
+
+
 
 ROOT="$HOME/rvsh"
 
-# Ecriture d'un message à un autre utilisateur
-# $1 identifiant de connexion de la forme utilisateur@machine puis le message
-# $2 utilisateur qui envoie le message
-# TODO : Vérifier que la paire Utilisateur@Machine existe.
+
+# ====  WRITE  ========================================================
+#
+#		 NAME : write
+# DESCRIPTION : Send a message to the user specify who is connected
+#				on the specified virtual machine.
+# PARAMETER $1: String where the first word is "user@vm" and the
+#				rest is the message to send.
+#			$2: Is the name of the sender.
+# =====================================================================
+
 write() {
 
 	cible=($1)
