@@ -1,7 +1,17 @@
 #!/bin/bash 
 
-# Fonction de bas de gestion
-# du système de messagerie
+# =====================================================================
+#
+#           FILE : msg.sh
+#
+#          USAGE : msg.sh
+#
+#    DESCRIPTION : Fonction utilitaire liée à la messagerie.
+#
+#
+#         OPTION : voir fonction check_msg.
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+# =====================================================================
 
 ROOT="$HOME/rvsh"
 
@@ -10,8 +20,14 @@ NC='\e[0m'       # Text Reset
 
 
 
-# Affiche les messages reçus par l'utilisateurs
-# $1 : utilisateurs en session
+
+
+# ====  PRINT_MSG  ====================================================
+#
+#        NAME : print_msg
+# DESCRIPTION : Affiche les messages reçus par l'utilisateurs.
+# PARAMETER $1: L'utilisateur dont on veut afficher les messages.
+# =====================================================================
 
 print_msg() {
 
@@ -32,6 +48,15 @@ print_msg() {
 
 #Vérifie si l'utilisateur a reçu un ou plusieurs messages.
 # $1 : Nom de l'utilisateur
+
+# ====  CHECK_MSG  ====================================================
+#
+#        NAME : check_msg
+# DESCRIPTION : Vérifie si l'utilisateur a de nouveaux messages.
+# PARAMETER $1: L'utilisateur dont on veut vérifier si il a de 
+#				de nouveaux messages.
+# =====================================================================
+
 check_msg() {
 
 	if [ ! -d $ROOT/users/$1/msg/ ]
