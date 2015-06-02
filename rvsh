@@ -175,6 +175,15 @@ usage() {
 }
 
 
+
+# ====  READKEY  ======================================================
+#
+#        NAME : ReadKey
+# DESCRIPTION : Lis les entrées claviers lettre par lettre, lis le
+#               tampon si un caractère spécial a été saisis.
+# PARAMETER   : Pas de paramètre.
+# =====================================================================
+
 ReadKey() {
     # Wait for first char
     if IFS="" read -n1 _REPLY; then
@@ -186,6 +195,14 @@ ReadKey() {
 }
 
 
+# ====  HISTORY_CMD  ==================================================
+#
+#        NAME : history_cmd
+# DESCRIPTION : Gère l'appuie des touches spéciales (haut,bas backspace)
+#               afin de mettre en place le système d'historique de 
+#               commande.
+# PARAMETER   : Pas de paramètre.
+# =====================================================================
 history_cmd() {
 
     stop="n"
