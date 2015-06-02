@@ -1,16 +1,36 @@
-#!/bin/bash
-#---------------------------------------------------
-# title         : rvsh.sh 
-# author        : G. Mahfoudi & S. JUHEL
-# version       : 0.1    
-# description   : ...
-# bash_version  : 4.3.X-release
-#---------------------------------------------------
+#===================================================================================
+# file         : rvsh
+# 
+# usage        : rvsh.sh [--admin | --connect <hostname> <username>]
+#
+# description  : commande shell qui permet de creer un réseau virtuel de machines
+#                ainsi que de l'administrer
+#
+# options      : 
+#   -h, --help       show this help message and quit
+#   -a, --admin      log in the virtual machine as administrator
+#   -c, --connect    log in the virtual machine as simple user
+#                    you must specify the hostname and the username.
+#                    (you can connect as a guest, use guest 
+#                    for both username and hostname)
+#
+#   -i, --install    install this program and exit
+#   -u, --uninstall  uninstall this program and exit
+#
+#
+# authors      : G. MAHFOUDI & S. JUHEL
+# company      : UTT
+# version      : 1.0
+# bugs         : ---
+# notes        : ---
+# created      : ---
+# revision     : ---
+#===================================================================================
 
-# utils
+
+#=== includes ======================================================================
 source handle_connections.sh
 
-# users bin
 source connect.sh
 source passwd.sh
 source rhost.sh
@@ -22,10 +42,11 @@ source write.sh
 source msg.sh
 source finger.sh
 
-
 source host.sh
 source users.sh
 source afinger.sh
+#=== end includes ==================================================================
+
 
 # Reset
 NC='\e[0m'       # Text Reset
@@ -162,7 +183,7 @@ handle_users_cmd() {
     local hostname="$2"
     local ctime="$3"
     local cmd=""    # commande entree par l'utilisateur
-    local user_prompt="${BGREEN}${username}${BWHIHTE}@${BGREEN}${hostname} >${NC}"
+    local user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}>${NC}"
     
     while [ "$cmd" != "quit" ]
     do
@@ -239,7 +260,7 @@ handle_users_cmd() {
 handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
-    local admin_prompt="${BRED}rvsh >${NC}"
+    local admin_prompt="${BLUE}rvsh>${NC}"
     
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
         echo -en "$admin_prompt "
@@ -364,7 +385,7 @@ main() {
 
         if [ -z "$1" ] 
         then
-            echo "Vous devez preciser le nom d'utilisateur..."
+            echo "You must specify a username"
             exit
         else
             username="$1"
