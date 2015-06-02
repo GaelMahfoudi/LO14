@@ -1,12 +1,27 @@
-#!/bin/bash
+#!/bin/bash 
 
-# Commande afinger, permet de 
-# rajouter des informations 
-# complémantaires sur l'util-
-# isateurs
+# =====================================================================
+#
+#           FILE : afinger.sh
+#
+#          USAGE : afinger.sh [-tm utilisateurs] [-h]
+#
+#    DESCRIPTION : Permet à l'utilisateur d'afficher les informations 
+#                  complémentaires de l'utilisateur spécifié.
+#
+#
+#         OPTION : voir fonction help_finger.
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+# =====================================================================
 
 ROOT="$HOME/rvsh"
 
+# ====  ADD_PHONE  ====================================================
+#
+#        NAME : add_phone
+# DESCRIPTION : Permet d'ajouter/supprimer un tel pour l'utilisateur.
+# PARAMETER $1: L'utilisateur à modifier.
+# =====================================================================
 
 function add_phone {
 
@@ -64,6 +79,14 @@ function add_phone {
 
 }
 
+
+# ====  ADD_MAIL  ====================================================
+#
+#        NAME : add_mail
+# DESCRIPTION : Permet d'ajouter/supprimer un mail pour l'utilisateur.
+# PARAMETER $1: L'utilisateur à modifier.
+# =====================================================================
+
 function add_mail {
 
     if [ ! -e $ROOT/users/$1/mails ]
@@ -118,8 +141,14 @@ function add_mail {
 }
 
 
-# Gère les options passé en paramètre
-# $1 : Les options est arguments
+# ====  AFINGER  ======================================================
+#
+#        NAME : afinger
+# DESCRIPTION : Effectue le parsage des arguments et appelle les
+#               fonctions appropriées.
+# PARAMETER $1: Liste des arguments
+# =====================================================================
+
 function afinger  {
     
     local OPTIND
