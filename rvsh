@@ -175,6 +175,78 @@ usage() {
 }
 
 
+ReadKey() {
+    # Wait for first char
+    if IFS="" read -n1 _REPLY; then
+      # Read rest of chars
+      while read -n1 -t 0.001 ; do
+        _REPLY+="${REPLY}"
+      done
+    fi
+}
+
+
+history_cmd() {
+
+    stop="n"
+    i=$((1))
+    tailleHist=$(($(cat hist | wc -l)))
+    cmd=""
+
+    while [ "$stop" = "n" ]
+    do
+
+      stop="o"
+      echo -en "\r                                   \r"
+      echo -en "$1 $cmd"
+
+      
+      ReadKey
+      case $_REPLY in
+        [A)
+
+                i=$((i-1))
+
+                if [ $i -eq 0 ]
+                then
+                  i=$((tailleHist))
+                fi
+
+                cmd=$(sed -n ${i}p hist)
+
+                stop="n";;
+
+
+        [B )
+
+
+                i=$((i+1))
+
+                if [ $i -eq $(($tailleHist+1)) ]
+                then
+                  i=$((1))
+                fi
+
+                cmd=$(sed -n ${i}p hist)
+
+                stop="n";;
+        )
+                if [ "$cmd" != "" ]
+                then
+                  cmd=${cmd:0:$((${#cmd}-1))}
+                else
+                  cmd=""
+                fi
+                stop="n";;
+        "")     stop="o";;
+        *)      cmd=$cmd$_REPLY
+                stop="n";;
+      esac
+    done
+
+    echo -e "$cmd" >> hist
+}
+
 
 handle_users_cmd() {
 
@@ -187,8 +259,13 @@ handle_users_cmd() {
     
     while [ "$cmd" != "quit" ]
     do
-        echo -en "$user_prompt "
-        read tmp
+        # echo -en "$user_prompt "
+        # read tmp
+
+        history_cmd $user_prompt
+
+        tmp=$cmd
+
         cmd=($tmp)
         cmd=${cmd[0]}
         param=${tmp:${#cmd}}
@@ -263,8 +340,13 @@ handle_admin_cmd() {
     local admin_prompt="${BLUE}rvsh>${NC}"
     
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
-        echo -en "$admin_prompt "
-        read tmp
+        # echo -en "$admin_prompt "
+        # read tmp
+
+        history_cmd $admin_prompt
+
+        tmp=$cmd
+
         cmd=($tmp)
         cmd=${cmd[0]}
         param=${tmp:${#cmd}}

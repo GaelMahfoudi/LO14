@@ -172,7 +172,7 @@ add_access_host() {
     
         while [ "$newhost" = "" ]
         do
-            read -p "Enter the new accessible host for $1: " newname
+            read -p "Enter the new accessible host for $1: " newhost
         done
     
         echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
