@@ -7,11 +7,11 @@
 #
 #          USAGE : users.sh [-arpnm user] [-lh]
 #
-#    DESCRIPTION : Allows the administrator to modify users information
-#                  such as the name, password etc ...
+#    DESCRIPTION : Permet à l'administrater de gérer les informations 
+#                  des utilisateurs.
 #
 #
-#         OPTION : see help_users function
+#         OPTION : voir la fonction help_users
 #         AUTHOR : Gaël Mahfoudi & Simon Juhel
 # =====================================================================
 
@@ -25,8 +25,8 @@ ROOT="$HOME/rvsh"
 # ====  USER_LIST  ====================================================
 #
 #        NAME : user_list
-# DESCRIPTION : List all the existing users.
-# PARAMETER   : No parameters.
+# DESCRIPTION : Liste des utilisateurs existants.
+# PARAMETER   : Pas de paramètre.
 # =====================================================================
 
 user_list() {
@@ -43,8 +43,8 @@ user_list() {
 # ====  ADD_USER  =====================================================
 #
 #        NAME : add_user
-# DESCRIPTION : Add a new user.
-# PARAMETER $1: Name of the new user.
+# DESCRIPTION : Ajoute un utilisateur.
+# PARAMETER $1: Nom du nouvel utilisateur.
 # =====================================================================
 
 add_user() {
@@ -64,8 +64,8 @@ add_user() {
 # ====  DEL_USER  =====================================================
 #
 #        NAME : del_user
-# DESCRIPTION : Delete an existing user.
-# PARAMETER $1: Name of the user to delete.
+# DESCRIPTION : Supprime un utilisateur existant.
+# PARAMETER $1: Nom de l'utilisateur à supprimer.
 # =====================================================================
 
 del_user() {
@@ -89,8 +89,8 @@ del_user() {
 # ====  CHANGE_PASSWORD  ==============================================
 #
 #        NAME : change_password
-# DESCRIPTION : Change the user password.
-# PARAMETER $1: The user who will see is password changed.
+# DESCRIPTION : Change le mot de passe de l'utilisateur.
+# PARAMETER $1: L'utilisateur à modifier.
 # =====================================================================
 
 change_password() {
@@ -119,8 +119,8 @@ change_password() {
 # ====  CHANGE_NAME  ==================================================
 #
 #        NAME : change_name
-# DESCRIPTION : Change the user name.
-# PARAMETER $1: The user who will see is name changed.
+# DESCRIPTION : Change le nom d'utilisateur.
+# PARAMETER $1: L'utilisateur à modifier.
 # =====================================================================
 
 change_name() {
@@ -160,8 +160,8 @@ change_name() {
 # ====  ADD_ACCESS_HOST  ==============================================
 #
 #        NAME : add_access_host
-# DESCRIPTION : Add access to the host specified to the user specified.
-# PARAMETER $1: The user who will have acces to the host.
+# DESCRIPTION : Ajoute l'accès à la machine spécifiée.
+# PARAMETER $1: L'utilisateur qui aura l'accès.
 # =====================================================================
 
 add_access_host() {
@@ -186,7 +186,7 @@ add_access_host() {
 #
 #        NAME : help_users
 # DESCRIPTION : Show the help for the function users
-# PARAMETER   : No parameters.
+# PARAMETER   : Pas de paramètre.
 # =====================================================================
 
 help_users() {
@@ -209,9 +209,9 @@ help_users() {
 # ====  USERS  ========================================================
 #
 #        NAME : users
-# DESCRIPTION : Core function. Parse the arguments and call the approp-
-#               riate function.
-# PARAMETER $1: Arguments list.
+# DESCRIPTION : Effectue le parsage des arguments et appelle les
+#               fonctions appropriées.
+# PARAMETER $1: Liste de arguments.
 # =====================================================================
 
 users() {
