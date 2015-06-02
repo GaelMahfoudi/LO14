@@ -4,13 +4,12 @@
 #
 #			FILE : write.sh
 #
-#		   USAGE : write.sh [user@vm] [Message to send]
+#		   USAGE : write.sh [utilisateur@vm] [Message à envoyer]
 #
-#	 DESCRIPTION : Send a message to the user specify who is connected
-#				   on the specified virtual machine.
+#	 DESCRIPTION : Envoi un message à l'utilisateur spécifié.
 #
 #
-#		  OPTION : see write_usage function
+#		  OPTION : voir la fonction help_write
 #		  AUTHOR : Gaël Mahfoudi & Simon Juhel
 # =====================================================================
 
@@ -22,11 +21,10 @@ ROOT="$HOME/rvsh"
 # ====  WRITE  ========================================================
 #
 #		 NAME : write
-# DESCRIPTION : Send a message to the user specify who is connected
-#				on the specified virtual machine.
-# PARAMETER $1: String where the first word is "user@vm" and the
-#				rest is the message to send.
-#			$2: Is the name of the sender.
+# DESCRIPTION : Envoi un message à l'utilisateur spécifié.
+# PARAMETER $1: Chaine de caractère ou le premier mot est 
+#				"utilisateur@vm" puis le reste est le message à envoyer
+#			$2: Nom de l'utilisateur qui envoie le message.
 # =====================================================================
 
 write() {
