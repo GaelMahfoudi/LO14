@@ -185,7 +185,7 @@ add_access_host() {
 # ====  HELP_USERS  ===================================================
 #
 #        NAME : help_users
-# DESCRIPTION : Show the help for the function users
+# DESCRIPTION : Affiche l'aide de la fonction users.
 # PARAMETER   : Pas de paramètre.
 # =====================================================================
 
