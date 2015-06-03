@@ -205,9 +205,15 @@ ReadKey() {
 # =====================================================================
 history_cmd() {
 
+    if [ ! -e $ROOT/hist ]
+    then
+        touch $ROOT/hist
+        echo -e "\n" >> $ROOT/hist
+    fi
+
     stop="n"
     i=$((1))
-    tailleHist=$(($(cat hist | wc -l)))
+    tailleHist=$(($(cat $ROOT/hist | wc -l)))
     cmd=""
 
     while [ "$stop" = "n" ]
@@ -229,7 +235,7 @@ history_cmd() {
                   i=$((tailleHist))
                 fi
 
-                cmd=$(sed -n ${i}p hist)
+                cmd=$(sed -n ${i}p $ROOT/hist)
 
                 stop="n";;
 
@@ -244,7 +250,7 @@ history_cmd() {
                   i=$((1))
                 fi
 
-                cmd=$(sed -n ${i}p hist)
+                cmd=$(sed -n ${i}p $ROOT/hist)
 
                 stop="n";;
         )
@@ -261,7 +267,7 @@ history_cmd() {
       esac
     done
 
-    echo -e "$cmd" >> hist
+    echo -e "$cmd" >> $ROOT/hist
 }
 
 
