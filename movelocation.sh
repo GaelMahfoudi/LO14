@@ -11,5 +11,6 @@ move_location(){
 		new_location=$(echo $old_location | sed 's/\/.*$//g')
 	else
 		new_location=$old_location"/$direction"
+		echo $new_location
 	fi
 } 

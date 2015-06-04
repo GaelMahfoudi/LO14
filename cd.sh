@@ -24,6 +24,8 @@ cd() {
 	local direction=$2
 	local type_of_user=$3
 
+	_new_location=$old_location
+
 	if [ "$type_of_user" = "admin" ]
 	then
 		if [ "$direction" = ".." ]
@@ -41,8 +43,10 @@ cd() {
 			if [ ! "$(ls $HOME$old_location | grep $direction)" = "" ]
 			then
 				move_location $old_location $direction
+				_new_location=$new_location
 			else
 				echo "No such a directorie"
+				_new_location=$old_location
 			fi
 		fi
 	else
@@ -55,13 +59,16 @@ cd() {
 			if [ "$nbf" != "2" ]
 			then
 				move_location $old_location $direction
+				_new_location=$new_location
 			fi
 		else
-			if [ ! "$(ls $HOME$old_location | grep $direction)" = "" ]
+			if [ ! "$(ls $HOME/rvsh$old_location | grep $direction)" = "" ]
 			then
 				move_location $old_location $direction
+				_new_location=$new_location
 			else
 				echo "No such a directorie"
+				_new_location=$old_location
 			fi
 		fi
 	fi

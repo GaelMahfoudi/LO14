@@ -41,6 +41,7 @@ source rusers.sh
 source write.sh
 source msg.sh
 source finger.sh
+source cd.sh
 
 source host.sh
 source users.sh
@@ -211,6 +212,7 @@ history_cmd() {
         echo -e "\n" >> $ROOT/hist
     fi
 
+
     stop="n"
     i=$((1))
     tailleHist=$(($(cat $ROOT/hist | wc -l)))
@@ -307,14 +309,14 @@ handle_users_cmd() {
     local hostname="$2"
     local ctime="$3"
     local cmd=""    # commande entree par l'utilisateur
-    local user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}>${NC}"
+    local user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}  $GREEN$location $BLUE>${NC}"
     
     while [ "$cmd" != "quit" ]
     do
         # echo -en "$user_prompt "
         # read tmp
 
-        history_cmd $user_prompt
+        history_cmd "$user_prompt"
 
         tmp=$cmd
 
@@ -389,13 +391,15 @@ handle_users_cmd() {
 handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
-    local admin_prompt="${BLUE}rvsh>${NC}"
+    local admin_prompt="${BLUE}rvsh $GREEN$location  $BLUE>${NC}"
+
     
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
         # echo -en "$admin_prompt "
         # read tmp
 
-        history_cmd $admin_prompt
+        admin_prompt="${BLUE}rvsh $GREEN$location  $BLUE>${NC}"
+        history_cmd "$admin_prompt"
 
         tmp=$cmd
 
@@ -428,7 +432,11 @@ handle_admin_cmd() {
         
             users $param
             ;;
-        
+
+        'cd')
+            cd $location $param "admin"
+            location=$_new_location
+            ;;        
         '')
             continue
             ;;
@@ -553,6 +561,8 @@ main() {
     # il prime sur le mode utilisateur 
     #
     if [ "$admin_flag" = "on" ]; then
+
+        location="/rvsh"
         
         connect "admin" "rvsh" && \
         write_logs "admin" "rvsh" "connected" &&\
@@ -560,6 +570,7 @@ main() {
 
     elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
 
+        location='\/$username'
         connect "$username" "$hostname" && \
         write_logs "$username" "$hostname" "connected" && \
         handle_users_cmd "$username" "$hostname" "$(date +%T)"
