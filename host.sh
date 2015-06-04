@@ -67,7 +67,7 @@ add_host() {
 
 del_host() {
     if [ -d $ROOT/host/$1 ]; then 
-        rmdir $ROOT/host/$1
+        rm -r $ROOT/host/$1
         echo -e "The host $1 has been removed."
     else
         echo -e "The host $1 doesn't exist."

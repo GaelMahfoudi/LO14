@@ -19,6 +19,17 @@ ROOT="$HOME/rvsh"
 
 
 
+help_finger() {
+
+    echo "usage: afinger [-h]"
+    echo ""
+    echo "  -h      show this help and quit"
+    echo "  <user>  Show this user info"
+    echo ""
+
+
+}
+
 # ====  FINGER  =======================================================
 #
 #        NAME : finger
@@ -28,6 +39,12 @@ ROOT="$HOME/rvsh"
 # =====================================================================
 
 function finger  {
+
+	if [ "$1" = "" -o "$1" = "-h" ]
+    then
+        help_finger
+        return
+    fi
     
 	mailList=$(cat $ROOT/users/$1/mails)
 	phoneList=$(cat $ROOT/users/$1/phones)

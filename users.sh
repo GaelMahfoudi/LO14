@@ -176,6 +176,7 @@ add_access_host() {
         done
     
         echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
+        mkdir $ROOT/host/$newhost/$1
     else
         echo "You can't add host to the administrator"
     fi

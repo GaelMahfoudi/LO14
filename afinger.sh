@@ -10,7 +10,7 @@
 #                  complémentaires de l'utilisateur spécifié.
 #
 #
-#         OPTION : voir fonction help_finger.
+#         OPTION : voir fonction help_afinger.
 #         AUTHOR : Gaël Mahfoudi & Simon Juhel
 # =====================================================================
 
@@ -141,6 +141,18 @@ function add_mail {
 }
 
 
+help_afinger() {
+
+    echo "usage: afinger [-mth]"
+    echo ""
+    echo "  -h        show this help and quit"
+    echo "  -m  <user>  Add or Del an email for the user specified"
+    echo "  -t  <user>  Add or Del a phone number for the user specified"
+    echo ""
+
+
+}
+
 # ====  AFINGER  ======================================================
 #
 #        NAME : afinger
@@ -151,12 +163,20 @@ function add_mail {
 
 function afinger  {
     
+
+    if [ "$1" = "" ]
+    then
+        help_afinger
+        return
+    fi
+    
     local OPTIND
     getopts "m:t:h" OPTION
     
     case $OPTION in
         "m" ) add_mail $OPTARG;;
         "t" ) add_phone $OPTARG;;
-        "h" ) echo "A faire";;
+        "h" ) help_afinger;;
+        "" ) help_afinger;;
     esac
 }

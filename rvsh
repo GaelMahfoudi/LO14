@@ -215,7 +215,7 @@ history_cmd() {
     i=$((1))
     tailleHist=$(($(cat $ROOT/hist | wc -l)))
     cmd=""
-
+    posCurs=$((0))
     while [ "$stop" = "n" ]
     do
 
@@ -223,7 +223,9 @@ history_cmd() {
       echo -en "\r                                   \r"
       echo -en "$1 $cmd"
 
-      
+      tailleCmd=${#cmd}
+
+
       ReadKey
       case $_REPLY in
         [A)
@@ -236,6 +238,8 @@ history_cmd() {
                 fi
 
                 cmd=$(sed -n ${i}p $ROOT/hist)
+
+                posCurs=$((${#cmd}+1))
 
                 stop="n";;
 
@@ -252,17 +256,42 @@ history_cmd() {
 
                 cmd=$(sed -n ${i}p $ROOT/hist)
 
+                posCurs=$((${#cmd}+1))
+
                 stop="n";;
+
+        [C ) 
+                if [ ! $posCurs -eq $tailleCmd  ]
+                then
+                    posCurs=$(($posCurs-1))
+                fi
+
+
+                stop="n"
+                ;;
+
+        [D ) 
+                if [ ! $posCurs -eq 0 ]
+                then
+                    posCurs=$(($posCurs+1))
+                fi
+
+                tput cub1
+                stop="n"
+                ;;
+
         )
                 if [ "$cmd" != "" ]
                 then
                   cmd=${cmd:0:$((${#cmd}-1))}
+                  tailleCmd=$(($tailleCmd+1))
                 else
                   cmd=""
                 fi
                 stop="n";;
         "")     stop="o";;
         *)      cmd=$cmd$_REPLY
+                tailleCmd=$(($tailleCmd+1))
                 stop="n";;
       esac
     done
