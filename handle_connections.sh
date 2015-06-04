@@ -145,7 +145,7 @@ pop_user_connexion() {
     # sur la machine à l'aide de sa connexion
     new_content=$(cat $ROOT/host/$hostname/$username.tmp | sed /$ctime/d)
 
-    if [ -s "$new_content" ]; then
+    if [ -s $new_content ]; then
 
         # si il n'y a plus de lignes de connexions dans le fichier
         # on le supprime

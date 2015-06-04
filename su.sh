@@ -66,9 +66,13 @@ switch_user() {
 	# sinon
 	else
 
-		connect "$username" "$hostname" && \						# on se connecte en tant que nouvel utilisateur sur la meme machine
-        write_logs "$username" "$hostname" "connected" && \			# puis on ecrit les logs de connexion
-        handle_users_cmd "$username" "$hostname" "$(date +%T)"		# puis on gère la nouvelle ligne de commande
+		# on se connecte en tant que nouvel utilisateur sur la meme machine
+		# puis on ecrit les logs de connexion
+		# puis on gère la nouvelle ligne de commande
+
+		connect "$username" "$hostname" && \
+		write_logs "$username" "$hostname" "connected" && \
+        handle_users_cmd "$username" "$hostname" "$(date +%T)"
     
     fi
 }
