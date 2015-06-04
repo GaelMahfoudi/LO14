@@ -166,6 +166,7 @@ change_name() {
 
 add_access_host() {
 
+
     if [ ! "$1" = "admin" ]
     then
         local newhost=""
@@ -173,6 +174,10 @@ add_access_host() {
         while [ "$newhost" = "" ]
         do
             read -p "Enter the new accessible host for $1: " newhost
+            if [ ! -d  $ROOT/host/$newhost ]; then
+                echo "$newhost does not exists."
+                newhost=""
+            fi
         done
     
         echo -e "$newhost\n" >> $ROOT/users/$1/hostlist

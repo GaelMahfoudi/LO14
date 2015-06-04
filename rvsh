@@ -63,15 +63,15 @@ PURPLE='\e[0;35m'       # Purple
 CYAN='\e[0;36m'         # Cyan
 WHITE='\e[0;37m'        # White
 
-# Bold
-BBLACK='\e[1;30m'       # Black
-BRED='\e[1;31m'         # Red
-BGREEN='\e[1;32m'       # Green
-BYELLOW='\e[1;33m'      # Yellow
-BBLUE='\e[1;34m'        # Blue
-BPURPLE='\e[1;35m'      # Purple
-BCYAN='\e[1;36m'        # Cyan
-BWHIHTE='\e[1;37m'      # White
+# # Bold
+# BBLACK='\e[1;30m'       # Black
+# BRED='\e[1;31m'         # Red
+# BGREEN='\e[1;32m'       # Green
+# BYELLOW='\e[1;33m'      # Yellow
+# BBLUE='\e[1;34m'        # Blue
+# BPURPLE='\e[1;35m'      # Purple
+# BCYAN='\e[1;36m'        # Cyan
+# BWHIHTE='\e[1;37m'      # White
 
 
 ROOT="$HOME/rvsh"
@@ -83,12 +83,12 @@ make_help() {
     # admincmd
     echo 'Aide des commandes administrateur (tapez <cmd> -h pour plus de precrisions)
 
-ls: toi
-cd: toi
-mkdir: toi
-rmdir:
-pwd: toi
-whois: a voir 
+ls: liste les fichier du repertoire courant
+cd: change de repertoire
+mkdir: cree un repertoire
+rmdir: supprime un repertoire 
+pwd: affiche le repertoire courant
+whoison: affiche tout les utilisateur connectes à une machine 
 host: ajoute/enleve une machine du reseau virtuel
 users: ajoute/enleve un utilisateur du reseau virtuel
 afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.help/admincmd
@@ -96,13 +96,13 @@ afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.h
     # userscmd
     echo 'Aide des commandes utilisateur (tapez <cmd> -h pour plus de precisions)
 
-cd:
-ls:
-mkdir:
-rmdir:
-pwd:
-text:
-wall:
+ls: liste les fichier du repertoire courant
+cd: change de repertoire
+mkdir: cree un repertoire
+rmdir: supprime un repertoire 
+pwd: affiche le repertoire courant
+text: editeur de texte en ligne
+wall: envoie un message a tout le monde.
 who: affiche la liste des utilisateurs connectes sur une VM
 rusers: affiche la liste des utilisateurs connectes au reseau
 rhost: affiche la liste des machines du reseau virtuel
@@ -353,6 +353,36 @@ handle_users_cmd() {
             clear
             ;;
 
+        'cd')
+            echo "[!] commande en dev"
+            ;;
+
+        'ls')
+            echo "[!] commande en dev"
+            ;;
+
+        'mkdir')
+            echo "[!] commande en dev"
+            ;;
+
+        'rmdir')
+            echo "[!] commande en dev"
+            ;;
+
+        'pwd')
+            echo "[!] commande en dev"
+            ;;
+
+
+
+        'text')
+            echo "[!] commande en dev"
+            ;;
+
+        'wall')
+            echo "[!] commande en dev"
+            ;;
+
         'who')
             who_is_connected_on $hostname            
             ;;
@@ -433,6 +463,31 @@ handle_admin_cmd() {
         'clear' | 'c')
             clear
             ;;
+
+        'cd')
+            echo "[!] commande en dev"
+            ;;
+
+        'ls')
+            echo "[!] commande en dev"
+            ;;
+
+        'mkdir')
+            echo "[!] commande en dev"
+            ;;
+
+        'rmdir')
+            echo "[!] commande en dev"
+            ;;
+
+        'pwd')
+            echo "[!] commande en dev"
+            ;;
+
+        'whoison')
+            echo "[!] commande en dev"
+            ;;
+
 
         'afinger')
             afinger $param
