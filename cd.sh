@@ -32,9 +32,9 @@ cd() {
 		then
 			nbf=$(echo $old_location | sed 's/\// /g')
 			nbf=($nbf)
-			nbf=${#nbf}
+			nbf=$((${#nbf}))
 
-			if [ "$nbf" != "2" ]
+			if [ ! $nbf -eq 2 ]
 			then
 				move_location $old_location $direction
 			fi

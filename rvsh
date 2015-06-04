@@ -83,6 +83,12 @@ make_help() {
     # admincmd
     echo 'Aide des commandes administrateur (tapez <cmd> -h pour plus de precrisions)
 
+ls: toi
+cd: toi
+mkdir: toi
+rmdir:
+pwd: toi
+whois: a voir 
 host: ajoute/enleve une machine du reseau virtuel
 users: ajoute/enleve un utilisateur du reseau virtuel
 afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.help/admincmd
@@ -90,6 +96,13 @@ afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.h
     # userscmd
     echo 'Aide des commandes utilisateur (tapez <cmd> -h pour plus de precisions)
 
+cd:
+ls:
+mkdir:
+rmdir:
+pwd:
+text:
+wall:
 who: affiche la liste des utilisateurs connectes sur une VM
 rusers: affiche la liste des utilisateurs connectes au reseau
 rhost: affiche la liste des machines du reseau virtuel
@@ -436,7 +449,15 @@ handle_admin_cmd() {
         'cd')
             cd $location $param "admin"
             location=$_new_location
-            ;;        
+            ;;
+
+        'pwd')
+            #echo "$location"
+            ;;  
+        'mkdir')
+            #echo "${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')"
+            #mkdir ${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')  
+            ;;      
         '')
             continue
             ;;
@@ -570,7 +591,7 @@ main() {
 
     elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
 
-        location='\/$username'
+        location="/$username"
         connect "$username" "$hostname" && \
         write_logs "$username" "$hostname" "connected" && \
         handle_users_cmd "$username" "$hostname" "$(date +%T)"
