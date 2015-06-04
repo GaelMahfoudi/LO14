@@ -60,9 +60,13 @@ connect_to_vm() {
     # dans le case ou une machine est précisée
     else
 
-        connect "$username" "$new_vm" && \                      # on se connecte sur la nouvelle machine
-        write_logs "$username" "$new_vm" "connected" &&\        # puis on ecrit les logs de connexion
-        handle_users_cmd "$username" "$new_vm" "$(date +%T)"    # puis on gère la nouvelle ligne de commande
+        # on se connecte sur la nouvelle machine
+        # puis on ecrit les logs de connexion
+        # puis on gère la nouvelle ligne de commande
+
+        connect "$username" "$new_vm" && \
+        write_logs "$username" "$new_vm" "connected" && \
+        handle_users_cmd "$username" "$new_vm" "$(date +%T)"    
     
     fi
 

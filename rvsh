@@ -376,7 +376,7 @@ handle_admin_cmd() {
         
         
         
-        # lecture de la commande entree
+        # lecture de la commande entreeuse
         case "$cmd" in
 
         'quit' | 'q')
