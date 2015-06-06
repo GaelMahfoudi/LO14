@@ -21,7 +21,9 @@
 # authors      : G. MAHFOUDI & S. JUHEL
 # company      : UTT
 # version      : 1.0
-# bugs         : ---
+# bugs         : 
+# 1 - echo "hostname" a chaque connexion utilisateur
+# 2 - switch user doit changer de repertoires
 # notes        : ---
 # created      : ---
 # revision     : ---
@@ -46,6 +48,7 @@ source cd.sh
 source host.sh
 source users.sh
 source afinger.sh
+source whoison.sh
 #=== end includes ==================================================================
 
 
@@ -364,7 +367,6 @@ handle_users_cmd() {
             ;;
 
 
-
         'text')
             echo "[!] commande en dev"
             ;;
@@ -475,9 +477,8 @@ handle_admin_cmd() {
             ;;
 
         'whoison')
-            echo "[!] commande en dev"
+            whoison $param
             ;;
-
 
         'afinger')
             afinger $param
@@ -491,18 +492,18 @@ handle_admin_cmd() {
             users $param
             ;;
 
-        'cd')
-            cd $location $param "admin"
-            location=$_new_location
-            ;;
+        # 'cd')
+        #     cd $location $param "admin"
+        #     location=$_new_location
+        #     ;;
 
-        'pwd')
-            #echo "$location"
-            ;;  
-        'mkdir')
-            #echo "${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')"
-            #mkdir ${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')  
-            ;;      
+        # 'pwd')
+        #     #echo "$location"
+        #     ;;  
+        # 'mkdir')
+        #     #echo "${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')"
+        #     #mkdir ${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')  
+        #     ;;      
         '')
             continue
             ;;
