@@ -220,6 +220,7 @@ history_cmd() {
 
 
     stop="n"
+    gd="n"
     i=$((1))
     tailleHist=$(($(cat $ROOT/hist | wc -l)))
     cmd=""
@@ -228,13 +229,20 @@ history_cmd() {
     do
 
       stop="o"
-      echo -en "\r                                   \r"
-      echo -en "$1 $cmd"
+
+      
+        tmpCmd=${cmd:0:$(($posCurs))}
+        echo -en "\r$(echo "$1 $cmd" | sed 's/./ /g')    \r"
+        echo -en "$1 $cmd"
+        echo -en "\r"
+        echo -en "$1 $tmpCmd"
+        
 
       tailleCmd=${#cmd}
-
-
+      gd="n"
       ReadKey
+
+      
       case $_REPLY in
         [A)
 
@@ -271,40 +279,52 @@ history_cmd() {
         [C ) 
                 if [ ! $posCurs -eq $tailleCmd  ]
                 then
-                    posCurs=$(($posCurs-1))
+                    posCurs=$(($posCurs+1))
                 fi
 
 
                 stop="n"
+                gd="o"
                 ;;
 
         [D ) 
                 if [ ! $posCurs -eq 0 ]
                 then
-                    posCurs=$(($posCurs+1))
+                    posCurs=$(($posCurs-1))
                 fi
 
-                tput cub1
                 stop="n"
+                gd="o"
                 ;;
 
         )
                 if [ "$cmd" != "" ]
                 then
-                  cmd=${cmd:0:$((${#cmd}-1))}
-                  tailleCmd=$(($tailleCmd+1))
+                  cmd=${cmd:0:$(($posCurs-1))}${cmd:$posCurs}
+                  tailleCmd=$(($tailleCmd-1))
+                  if [ ! $posCurs -eq 0 ]
+                  then
+                    posCurs=$(($posCurs-1))
+                  fi
                 else
                   cmd=""
                 fi
                 stop="n";;
         "")     stop="o";;
-        *)      cmd=$cmd$_REPLY
+        *)      
+                tmpCmdStart=${cmd:0:$(($posCurs))}
+                tmpCmdEnd=${cmd:$(($posCurs))}
+                cmd=$tmpCmdStart$_REPLY$tmpCmdEnd
                 tailleCmd=$(($tailleCmd+1))
+                posCurs=$(($posCurs+1))
                 stop="n";;
       esac
     done
 
-    echo -e "$cmd" >> $ROOT/hist
+    if [ "$cmd" != "" ]
+    then
+        echo -e "$cmd" >> $ROOT/hist
+    fi
 }
 
 
@@ -322,15 +342,18 @@ handle_users_cmd() {
         # echo -en "$user_prompt "
         # read tmp
 
+
+        user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}  $GREEN$location $BLUE>${NC}"
         history_cmd "$user_prompt"
+
+
+
 
         tmp=$cmd
 
         cmd=($tmp)
         cmd=${cmd[0]}
         param=${tmp:${#cmd}}
-
-
 
         check_msg $username
 
@@ -436,13 +459,11 @@ handle_admin_cmd() {
         admin_prompt="${BLUE}rvsh $GREEN$location  $BLUE>${NC}"
         history_cmd "$admin_prompt"
 
-        tmp=$cmd
+        tmp="$cmd"
 
         cmd=($tmp)
         cmd=${cmd[0]}
-        param=${tmp:${#cmd}}
-        
-        
+        param=${tmp:$((${#cmd}+1))}
         
         # lecture de la commande entreeuse
         case "$cmd" in
@@ -485,7 +506,7 @@ handle_admin_cmd() {
             ;;
 
         'host')
-            host $param
+            host "$param"
             ;;
         'users')
         
