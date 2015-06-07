@@ -70,7 +70,6 @@ WHITE='\e[0;37m'        # White
 ROOT="$HOME/rvsh"
 
 
-
 make_help() {
 
     # admincmd
@@ -644,7 +643,9 @@ main() {
         esac
 
     done
+    
 
+    clear
     echo "
   _______      _______ _    _ 
  |  __ \ \    / / ____| |  | |
