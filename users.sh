@@ -25,19 +25,23 @@ ROOT="$HOME/rvsh"
 # ====  USER_LIST  ====================================================
 #
 #        NAME : user_list
-# DESCRIPTION : Liste des utilisateurs existants.
+# DESCRIPTION : Liste des utilisateurs existants ainsi que leurs 
+#               accès aux machines.
 # PARAMETER   : Pas de paramètre.
 # =====================================================================
-
-user_list() {
+# user_list() {
     
-    list=$(ls $ROOT/users/)
-    if [ -z "$list" ]; then
-        echo "No users created"
-    else
-        echo "$list"
-    fi
-}
+#     list=$(ls $ROOT/users/)
+#     array_list=($list) # on recupere les utilisateurs sous forme d'un tableaux
+
+#     for usr in ${array_list[@]}; do
+
+#         access=($(cat $ROOT/users/$usr/hostlist))
+
+#         echo "$usr [access to " ${access[@]} ""
+
+
+# }
 
 
 # ====  ADD_USER  =====================================================

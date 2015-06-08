@@ -81,6 +81,7 @@ mkdir: cree un repertoire
 rmdir: supprime un repertoire 
 pwd: affiche le repertoire courant
 whoison: affiche tout les utilisateur connectes à une machine 
+access: affiche la liste des accès aux machines pour chaques utilisateurs:
 host: ajoute/enleve une machine du reseau virtuel
 users: ajoute/enleve un utilisateur du reseau virtuel
 afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.help/admincmd
@@ -334,7 +335,7 @@ handle_users_cmd() {
     local hostname="$2"
     local ctime="$3"
     local cmd=""    # commande entree par l'utilisateur
-    local user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}  $GREEN$location $BLUE>${NC}"
+    local user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW}>${NC}"
     
     while [ "$cmd" != "quit" ]
     do
@@ -342,7 +343,7 @@ handle_users_cmd() {
         # read tmp
 
 
-        user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}  $GREEN$location $BLUE>${NC}"
+        user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW}>${NC}"
         history_cmd "$user_prompt"
 
 
@@ -388,12 +389,7 @@ handle_users_cmd() {
             echo "[!] commande en dev"
             ;;
 
-
         'text')
-            echo "[!] commande en dev"
-            ;;
-
-        'wall')
             echo "[!] commande en dev"
             ;;
 
@@ -448,14 +444,14 @@ handle_users_cmd() {
 handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
-    local admin_prompt="${BLUE}rvsh $GREEN$location  $BLUE>${NC}"
+    local admin_prompt="${BLUE}rvsh:$GREEN$location$BLUE>${NC}"
 
     
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
         # echo -en "$admin_prompt "
         # read tmp
 
-        admin_prompt="${BLUE}rvsh $GREEN$location  $BLUE>${NC}"
+        admin_prompt="${BLUE}rvsh:$GREEN$location$BLUE>${NC}"
         history_cmd "$admin_prompt"
 
         tmp="$cmd"
