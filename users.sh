@@ -173,9 +173,19 @@ change_name() {
 # =====================================================================
 add_access_host() {
 
+    
+
+    if [ ! -e $ROOT/users/$1/hostlist ]
+    then
+        touch $ROOT/users/$1/hostlist
+    fi
+
+    local hostL=$(cat $ROOT/users/$1/hostlist)
+    local newhost=""
 
     if [ ! "$1" = "admin" ]
     then
+
         local newhost=""
     
         if [ ! -d $ROOT/users/$1 ]; then
@@ -183,17 +193,71 @@ add_access_host() {
             return
         fi
 
-        while [ "$newhost" = "" ]
-        do
-            read -p "Enter the new accessible host for user $1: " newhost
-            if [ ! -d  $ROOT/host/$newhost ]; then
-                echo "$newhost does not exists."
-                newhost=""
+
+        if [ "$hostL" = "" ]
+        then
+            echo "The user $1 has no host in his list"
+            while [ "$newhost" = "" ]
+            do
+                read -p "Enter the new accessible host for $1: " newhost
+                if [ ! -d  $ROOT/host/$newhost ]; then
+                    echo "$newhost does not exists."
+                    newhost=""
+                fi
+            done
+            echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
+            mkdir $ROOT/host/$newhost/$1
+        else
+
+            j=1
+            for i in $hostL
+            do
+                echo "$j) $i"
+                j=$(($j+1))
+            done
+
+            choice=""
+            while [ ! \( "$choice" = "add" -o "$choice" = "del"  -o "$choice" = "quit" \) ]
+            do
+                echo -en "\r                                                                      \r"
+                echo -en "Would you like to add or del one ? (add/del/quit) : "
+                read choice
+            done
+
+            if [ "$choice" = "add" ]
+            then
+                while [ "$newhost" = "" ]
+                do
+                    read -p "Enter the new accessible host for $1: " newhost
+                    if [ ! -d  $ROOT/host/$newhost ]; then
+                        echo "$newhost does not exists."
+                        newhost=""
+                    fi
+                done
+                echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
+                mkdir $ROOT/host/$newhost/$1
+            else
+                if [ "$choice" = "del" ]
+                then
+                    read -p "Which one would you like to remove ? (enter the number) : " hostToDel
+                    ind=$(($hostToDel-1))
+                    list=($hostL)
+                    hostToDel=${hostToDel}'d'
+                    tmp=$(sed $hostToDel "$ROOT/users/$1/hostlist")
+                    rm $ROOT/users/$1/hostlist
+                    touch $ROOT/users/$1/hostlist
+                    rm -r $ROOT/host/${list[$ind]}/$1
+
+                    for k in $tmp
+                    do
+                        if [ "$k" != "" ]
+                        then
+                            echo -e "$k" >> $ROOT/users/$1/hostlist
+                        fi
+                    done
+                fi
             fi
-        done
-    
-        echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
-        mkdir $ROOT/host/$newhost/$1
+        fi
     else
         echo "You can't add host to the administrator"
     fi
