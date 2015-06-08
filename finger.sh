@@ -1,5 +1,4 @@
 #!/bin/bash 
-
 # =====================================================================
 #
 #           FILE : finger.sh
@@ -18,13 +17,12 @@
 ROOT="$HOME/rvsh"
 
 
-
 help_finger() {
 
     echo "usage: afinger [-h]"
     echo ""
     echo "  -h      show this help and quit"
-    echo "  <user>  Show this user info"
+    echo "  <user>  show this user info"
     echo ""
 
 

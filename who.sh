@@ -31,16 +31,20 @@ ROOT="/home/rvsh"
 who_is_connected_on() {
 
 	local hostname="$1"
+	
+	if [ ! -d $ROOT/host/$hostname ]; then
+		echo "Host $hostname does not exist"
+	done
+
+	printf "host: $hostname:\n"
+	printf "%-12s %-9s %-9s\n" "user" "hour" "date"
+	echo   "------------ --------  --------"
 
 	# on parcours l'ensemble des fichiers de connexion de la
 	# machine virtuelle
 	for conn in $(ls $ROOT/host/$hostname/*.tmp  2> /dev/null); do
 
 		# affichage formate des connexions trouvees dans le fichier
-		printf "$hostname:\n"
-		printf "%-12s %-9s %-9s\n" "user" "hour" "date"
-		echo   "------------ --------  --------"
-
 		cat $conn | awk -F',' '{printf "%-12s %-9s %-9s\n", $1, $2, $3	}'
 		printf "\n"
 		

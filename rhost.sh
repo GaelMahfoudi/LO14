@@ -35,7 +35,7 @@ rhost() {
 
 	# si le repertoire est vide, on le précise
     if [ -z "$list" ]; then
-        echo "No VMs created"
+        echo "No hosts created"
         
     # sinon on affiche la liste
     else

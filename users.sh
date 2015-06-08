@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 # =====================================================================
 #
 #           FILE : users.sh
@@ -16,10 +14,8 @@
 # =====================================================================
 
 
-
 # chemin d'accès à la racine de rvsh
 ROOT="$HOME/rvsh"
-
 
 
 # ====  USER_LIST  ====================================================
@@ -29,19 +25,28 @@ ROOT="$HOME/rvsh"
 #               accès aux machines.
 # PARAMETER   : Pas de paramètre.
 # =====================================================================
-# user_list() {
+user_list() {
     
-#     list=$(ls $ROOT/users/)
-#     array_list=($list) # on recupere les utilisateurs sous forme d'un tableaux
+    list=$(ls $ROOT/users/)
+    array_list=($list) # on recupere les utilisateurs sous forme d'un tableaux
 
-#     for usr in ${array_list[@]}; do
+    for usr in ${array_list[@]}; do
 
-#         access=($(cat $ROOT/users/$usr/hostlist))
+        if [ "$usr" = "admin" ]; then
+            continue
+        else
+            access=($(cat $ROOT/users/$usr/hostlist))
 
-#         echo "$usr [access to " ${access[@]} ""
-
-
-# }
+            if [ ${#access[@]} -eq 0 ]; then
+                printf "%-15s (access host: empty)\n" "$usr"  
+            else
+                tmp=$(printf ",%s" "${access[@]}")
+                access_str=${tmp:1}
+                printf "%-15s (access host: %s)\n" "$usr" "$access_str"
+            fi
+        fi
+    done
+}
 
 
 # ====  ADD_USER  =====================================================
@@ -50,7 +55,6 @@ ROOT="$HOME/rvsh"
 # DESCRIPTION : Ajoute un utilisateur.
 # PARAMETER $1: Nom du nouvel utilisateur.
 # =====================================================================
-
 add_user() {
 
     if [ ! -d $ROOT/users/$1 ]
@@ -71,7 +75,6 @@ add_user() {
 # DESCRIPTION : Supprime un utilisateur existant.
 # PARAMETER $1: Nom de l'utilisateur à supprimer.
 # =====================================================================
-
 del_user() {
 
     if [ ! "$1" = "admin" ]
@@ -96,7 +99,6 @@ del_user() {
 # DESCRIPTION : Change le mot de passe de l'utilisateur.
 # PARAMETER $1: L'utilisateur à modifier.
 # =====================================================================
-
 change_password() {
 
     local pass=""
@@ -126,7 +128,6 @@ change_password() {
 # DESCRIPTION : Change le nom d'utilisateur.
 # PARAMETER $1: L'utilisateur à modifier.
 # =====================================================================
-
 change_name() {
     
     
@@ -144,14 +145,17 @@ change_name() {
                 read -p "Enter the new name for $username: " newname
             done
         
-        
+            
+            if [ "$newname" = "$username" ]; then
+                return
+            fi
+
             mkdir $ROOT/users/$newname
             cp -r $ROOT/users/$username/* $ROOT/users/$newname
-            rm -r $ROOT/users/$username
+            rm -r $ROOT/users/$username 
+        
         else
-
             echo "User $1 does not exist"
-
         fi
 
     else
@@ -167,7 +171,6 @@ change_name() {
 # DESCRIPTION : Ajoute l'accès à la machine spécifiée.
 # PARAMETER $1: L'utilisateur qui aura l'accès.
 # =====================================================================
-
 add_access_host() {
 
 
@@ -175,9 +178,14 @@ add_access_host() {
     then
         local newhost=""
     
+        if [ ! -d $ROOT/users/$1 ]; then
+            echo "User $1 does not exist"
+            return
+        fi
+
         while [ "$newhost" = "" ]
         do
-            read -p "Enter the new accessible host for $1: " newhost
+            read -p "Enter the new accessible host for user $1: " newhost
             if [ ! -d  $ROOT/host/$newhost ]; then
                 echo "$newhost does not exists."
                 newhost=""
@@ -198,7 +206,6 @@ add_access_host() {
 # DESCRIPTION : Affiche l'aide de la fonction users.
 # PARAMETER   : Pas de paramètre.
 # =====================================================================
-
 help_users() {
 
     echo "usage: users [-arlh]"
@@ -223,7 +230,6 @@ help_users() {
 #               fonctions appropriées.
 # PARAMETER $1: Liste de arguments.
 # =====================================================================
-
 users() {
 
     local OPTIND
