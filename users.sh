@@ -32,19 +32,18 @@ user_list() {
 
     for usr in ${array_list[@]}; do
 
-        if [ "$usr" = "admin" ]; then
-            continue
-        else
-            access=($(cat $ROOT/users/$usr/hostlist))
+        [ "$usr" = "admin" ] || [ "$usr" = "guest" ] && continue
+            
+        access=($(cat $ROOT/users/$usr/hostlist))
 
-            if [ ${#access[@]} -eq 0 ]; then
-                printf "%-15s (access host: empty)\n" "$usr"  
-            else
-                tmp=$(printf ",%s" "${access[@]}")
-                access_str=${tmp:1}
-                printf "%-15s (access host: %s)\n" "$usr" "$access_str"
-            fi
+        if [ ${#access[@]} -eq 0 ]; then
+            printf "%-15s (access host: empty)\n" "$usr"  
+        else
+            tmp=$(printf ",%s" "${access[@]}")
+            access_str=${tmp:1}
+            printf "%-15s (access host: %s)\n" "$usr" "$access_str"
         fi
+        
     done
 }
 
@@ -174,24 +173,23 @@ change_name() {
 add_access_host() {
 
     
+    if [ ! -d $ROOT/users/$1 ]; then
+        echo "User $1 does not exist"
+        return
+    fi
 
     if [ ! -e $ROOT/users/$1/hostlist ]
     then
         touch $ROOT/users/$1/hostlist
     fi
 
-    local hostL=$(cat $ROOT/users/$1/hostlist)
+    local hostL=$(cat $ROOT/users/$1/hostlist) 
     local newhost=""
 
     if [ ! "$1" = "admin" ]
     then
 
         local newhost=""
-    
-        if [ ! -d $ROOT/users/$1 ]; then
-            echo "User $1 does not exist"
-            return
-        fi
 
 
         if [ "$hostL" = "" ]
