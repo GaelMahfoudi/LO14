@@ -65,6 +65,7 @@ add_host() {
 # =====================================================================
 del_host() {
     if [ -d $ROOT/host/$1 ]; then 
+        
         rm -r $ROOT/host/$1
         echo -e "The host $1 has been removed."
 
@@ -72,6 +73,10 @@ del_host() {
 
         for i in $userlist
         do
+
+            [ "$i" = "admin" ] && continue
+
+
             newHostlist=$(cat $ROOT/users/$i/hostlist)
             rm $ROOT/users/$i/hostlist
             touch $ROOT/users/$i/hostlist
