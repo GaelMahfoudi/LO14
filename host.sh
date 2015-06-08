@@ -69,6 +69,24 @@ del_host() {
     if [ -d $ROOT/host/$1 ]; then 
         rm -r $ROOT/host/$1
         echo -e "The host $1 has been removed."
+
+        userlist=$(ls $ROOT/users)
+
+        for i in $userlist
+        do
+            newHostlist=$(cat $ROOT/users/$i/hostlist)
+            rm $ROOT/users/$i/hostlist
+            touch $ROOT/users/$i/hostlist
+
+            for j in $newHostlist
+            do
+                if [ "$j" != "$1" ]
+                then
+                    echo -e "$k" >> $ROOT/users/$i/hostlist
+                fi
+            done
+        done
+
     else
         echo -e "The host $1 doesn't exist."
     fi
