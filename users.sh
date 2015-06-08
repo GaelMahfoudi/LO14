@@ -241,7 +241,7 @@ add_access_host() {
                     ind=$(($hostToDel-1))
                     list=($hostL)
                     hostToDel=${hostToDel}'d'
-                    tmp=$(sed $hostToDel "$ROOT/users/$1/hostlist")
+                    tmp=$(cat $ROOT/users/$1/hostlist | sed s/$hostToDel//d)
                     rm $ROOT/users/$1/hostlist
                     touch $ROOT/users/$1/hostlist
                     rm -r $ROOT/host/${list[$ind]}/$1
