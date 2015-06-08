@@ -336,6 +336,7 @@ handle_users_cmd() {
     local ctime="$3"
     local cmd=""    # commande entree par l'utilisateur
     local user_prompt="${YELLOW}${username}${BLUE}@${YELLOW}${hostname}  $GREEN$location $BLUE>${NC}"
+    location="/$username"
     
     while [ "$cmd" != "quit" ]
     do
@@ -450,6 +451,7 @@ handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
     local admin_prompt="${BLUE}rvsh $GREEN$location  $BLUE>${NC}"
+    location="/rvsh"
 
     
     while [ ! \( "$cmd" = "quit" -o "$cmd" = "q" \) ]; do
@@ -660,7 +662,7 @@ main() {
     #
     if [ "$admin_flag" = "on" ]; then
 
-        location="/rvsh"
+        
         
         connect "admin" "rvsh" && \
         write_logs "admin" "rvsh" "connected" &&\
@@ -668,7 +670,7 @@ main() {
 
     elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
 
-        location="/$username"
+        
         connect "$username" "$hostname" && \
         write_logs "$username" "$hostname" "connected" && \
         handle_users_cmd "$username" "$hostname" "$(date +%T)"

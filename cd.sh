@@ -30,13 +30,11 @@ cd() {
 	then
 		if [ "$direction" = ".." ]
 		then
-			nbf=$(echo $old_location | sed 's/\// /g')
-			nbf=($nbf)
-			nbf=$((${#nbf}))
 
-			if [ ! $nbf -eq 2 ]
+			if [ "$old_location" != "/$type_of_user" ]
 			then
 				move_location $old_location $direction
+				_new_location=$new_location
 			fi
 
 		else
@@ -52,11 +50,8 @@ cd() {
 	else
 		if [ "$direction" = ".." ]
 		then
-			nbf=$(echo $old_location | sed 's/\// /g')
-			nbf=($nbf)
-			nbf=${#nbf}
 
-			if [ "$nbf" != "2" ]
+			if [ "$old_location" != "/$type_of_user" ]
 			then
 				move_location $old_location $direction
 				_new_location=$new_location

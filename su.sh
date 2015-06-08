@@ -52,7 +52,6 @@ switch_user() {
 	local hostname="$1"
 	local username="$2"
 
-
 	# si aucun paramètres n'est envoyé à la commande
 	if [ -z $username ]; then
 
@@ -70,9 +69,17 @@ switch_user() {
 		# puis on ecrit les logs de connexion
 		# puis on gère la nouvelle ligne de commande
 
-		connect "$username" "$hostname" && \
-		write_logs "$username" "$hostname" "connected" && \
-        handle_users_cmd "$username" "$hostname" "$(date +%T)"
+		if [ "$username" = "admin" ]
+		then
+			connect "$username" "rvsh" && \
+			write_logs "$username" "rvsh" "connected" && \
+        	handle_admin_cmd 
+		else
+			connect "$username" "$hostname" && \
+			write_logs "$username" "$hostname" "connected" && \
+        	handle_users_cmd "$username" "$hostname" "$(date +%T)"
+		fi
+		
     
     fi
 }
