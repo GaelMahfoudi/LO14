@@ -1,45 +1,51 @@
-#===================================================================================
-# file         : rusers.sh
-# usage        : ---
+# =====================================================================
 #
-# description  : fichier source de la commande rusers.
-#         			
-# options      : ---
-# authors      : G. MAHFOUDI & S. JUHEL
-# company      : UTT
-# version      : 1.0
-# bugs         : ---
-# notes        : ---
-# created      : ---
-# revision     : ---
-#===================================================================================
+#           FILE : rusers.sh
+#
+#          USAGE : ---
+#
+#    DESCRIPTION : fichier source de la commande rusers
+#
+#
+#         OPTION : ---
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
+# =====================================================================
 
 
-# repertoire racine de rvsh
+# === GLOBAL VARIABLES ================================================
+
 ROOT="$HOME/rvsh"
 
-#=== includes ======================================================================
+# =====================================================================
+
+
+# === INCLUDES ========================================================
 
 source who.sh
 
-#=== end includes ==================================================================
+# =====================================================================
 
 
-#=== function ======================================================================
-# name         : rusers
-# description  : permet d'acceder à la liste des utilisateurs connectés sur
-#				 le réseau virtuel.
-#                
-# parameters   : ---
-# returns      : --- 
-#===================================================================================
+# === FUNCTION ========================================================
+#
+#        name: rusers
+# description: permet d'acceder à la liste des utilisateurs connectés 
+#              au réseau virtuel.
+# 
+#  parameters: ---
+#
+# =====================================================================
 rusers() {
 
 	# pour chaque machines du réseau virtuel
 	for host in $(ls $ROOT/host/); do
 
-		# on execute la commande who_is_connected
+		# on execute la commande who_is_connected_on
 		who_is_connected_on $host
 
 	done
+
 }
+
+# === END OF FILE =====================================================
