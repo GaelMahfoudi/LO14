@@ -189,6 +189,7 @@ grant_host_access() {
             else
                 echo "$host_to_add" >> $ROOT/users/$user_to_grant/hostlist 
                 echo "(grant access) $host_to_add added succesfully."
+                mkdir $ROOT/host/$host_to_add/$user_to_grant/
             fi
         fi
 
@@ -214,9 +215,9 @@ revoke_host_access() {
             # on verifie si l'hotes n'est pas encore dans le fichier
 
             if $(grep $host_to_del $ROOT/users/$user_to_revoke/hostlist > /dev/null); then
-                
-                file_content=$(cat $ROOT/users/$user_to_revoke/hostlist | sed /$host_to_del/d)
-                echo $file_content > $ROOT/users/$user_to_revoke/hostlist
+                rm -r $ROOT/host/$host_to_add/$user_to_revoke  
+                file_content=$(cat $ROOT/users/$user_to_revoke/hostlist | sed -e /$host_to_del/d -e s/^$//)
+                echo "$file_content" > $ROOT/users/$user_to_revoke/hostlist
                 echo "(revoke access) $host_to_del deleted succesfully."
 
             else

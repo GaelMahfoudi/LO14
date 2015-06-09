@@ -1,6 +1,6 @@
 #!/bin/bash
 
-move_location(){
+move_location() {
 
 	local old_location=$1
 	local direction=$2

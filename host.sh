@@ -64,30 +64,24 @@ add_host() {
 # PARAMETER $1: Nom de la machine à supprimer.
 # =====================================================================
 del_host() {
+
     if [ -d $ROOT/host/$1 ]; then 
         
         rm -r $ROOT/host/$1
         echo -e "The host $1 has been removed."
 
-        userlist=$(ls $ROOT/users)
+        userlist=$(ls $ROOT/users/)
 
-        for i in $userlist
+        for usr in $userlist
         do
 
-            [ "$i" = "admin" ] && continue
+            [ "$usr" = "admin" ] && continue
 
-
-            newHostlist=$(cat $ROOT/users/$i/hostlist)
-            rm $ROOT/users/$i/hostlist
-            touch $ROOT/users/$i/hostlist
-
-            for j in $newHostlist
-            do
-                if [ "$j" != "$1" ]
-                then
-                    echo -e "$k" >> $ROOT/users/$i/hostlist
-                fi
-            done
+            if $(grep $1 $ROOT/users/$usr/hostlist > /dev/null); then
+                new_hostlist=$(cat $ROOT/users/$usr/hostlist | sed -e /$1/d -e s/^$//)
+                echo "$new_hostlist" > $ROOT/users/$usr/hostlist
+            fi
+            
         done
 
     else
