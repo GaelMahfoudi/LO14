@@ -44,6 +44,9 @@ source write.sh
 source msg.sh
 source finger.sh
 source cd.sh
+source rvsh_ls.sh
+source rvsh_mkdir.sh
+source rvsh_rm.sh
 
 source host.sh
 source users.sh
@@ -371,23 +374,24 @@ handle_users_cmd() {
             ;;
 
         'cd')
-            echo "[!] commande en dev"
+            cd $location "$param" "admin"
+            location=$_new_location
             ;;
 
         'ls')
-            echo "[!] commande en dev"
+            rvsh_ls $location "$param"
             ;;
 
         'mkdir')
-            echo "[!] commande en dev"
+            rvsh_mkdir $location $param
             ;;
 
         'rmdir')
-            echo "[!] commande en dev"
+            rvsh_rm $location $param "$username"
             ;;
 
         'pwd')
-            echo "[!] commande en dev"
+            echo "$location"
             ;;
 
         'text')
@@ -476,23 +480,24 @@ handle_admin_cmd() {
             ;;
 
         'cd')
-            echo "[!] commande en dev"
+            cd $location "$param" "admin"
+            location=$_new_location
             ;;
 
         'ls')
-            echo "[!] commande en dev"
+            rvsh_ls $location "$param"
             ;;
 
         'mkdir')
-            echo "[!] commande en dev"
+            rvsh_mkdir $location $param
             ;;
 
-        'rmdir')
-            echo "[!] commande en dev"
+        'rm')
+            rvsh_rm $location $param "admin"
             ;;
 
         'pwd')
-            echo "[!] commande en dev"
+            echo "$location"
             ;;
 
         'lsc')

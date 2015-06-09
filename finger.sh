@@ -19,7 +19,7 @@ ROOT="$HOME/rvsh"
 
 help_finger() {
 
-    echo "usage: afinger [-h]"
+    echo "usage: finger [-h]"
     echo ""
     echo "  -h      show this help and quit"
     echo "  <user>  show this user info"
