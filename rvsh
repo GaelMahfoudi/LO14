@@ -227,7 +227,7 @@ history_cmd() {
     while [ "$stop" = "n" ]
     do
 
-      stop="o"
+        stop="o"
 
       
         tmpCmd=${cmd:0:$(($posCurs))}

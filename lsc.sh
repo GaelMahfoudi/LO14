@@ -51,6 +51,6 @@ lsc() {
         "h" ) help_lsc;;
         "a" ) rusers;;
         "m" ) who_is_connected_on $OPTARG;;
-         *) help_lsc;;
+         *  ) help_lsc;;
     esac
 }
