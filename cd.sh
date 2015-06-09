@@ -21,26 +21,26 @@ source movelocation.sh
 cd() {
 
 	local old_location=$1
-	local direction=$2
+	local _direction=$2
 	local type_of_user=$3
 
 	_new_location=$old_location
 
 	if [ "$type_of_user" = "admin" ]
 	then
-		if [ "$direction" = ".." ]
+		if [ "$_direction" = ".." ]
 		then
 
 			if [ "$old_location" != "/$type_of_user" ]
 			then
-				move_location $old_location $direction
+				move_location $old_location $_direction
 				_new_location=$new_location
 			fi
 
 		else
-			if [ ! "$(ls $HOME$old_location | grep $direction)" = "" ]
+			if [ ! "$(ls $HOME$old_location | grep $_direction)" = "" ]
 			then
-				move_location $old_location $direction
+				move_location $old_location $_direction
 				_new_location=$new_location
 			else
 				echo "No such a directorie"
@@ -48,18 +48,18 @@ cd() {
 			fi
 		fi
 	else
-		if [ "$direction" = ".." ]
+		if [ "$_direction" = ".." ]
 		then
 
 			if [ "$old_location" != "/$type_of_user" ]
 			then
-				move_location $old_location $direction
+				move_location $old_location $_direction
 				_new_location=$new_location
 			fi
 		else
-			if [ ! "$(ls $HOME/rvsh$old_location | grep $direction)" = "" ]
+			if [ ! "$(ls $HOME/rvsh$old_location | grep $_direction)" = "" ]
 			then
-				move_location $old_location $direction
+				move_location $old_location $_direction
 				_new_location=$new_location
 			else
 				echo "No such a directorie"
