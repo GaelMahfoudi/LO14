@@ -11,6 +11,5 @@ move_location(){
 		new_location=$(echo $old_location | awk -F "/" '{for (i=2; i < NF; i++) {printf "/%s", $i}}')
 	else
 		new_location=$old_location"/$direction"
-		echo $new_location
 	fi
 } 

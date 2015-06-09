@@ -17,6 +17,14 @@
 source movelocation.sh
 
 
+help_cd() {
+
+	echo "usage: cd <directory>"
+    echo ""
+    echo "  <directory>  The destination you want to reach. '..' allow you to go backward."
+    echo ""
+}
+
 
 cd() {
 
@@ -26,46 +34,75 @@ cd() {
 
 	_new_location=$old_location
 
+	if [ "$_direction" = "" ]
+	then
+		help_cd
+		return
+	fi
+
 	if [ "$type_of_user" = "admin" ]
 	then
-		if [ "$_direction" = ".." ]
-		then
 
-			if [ "$old_location" != "/$type_of_user" ]
-			then
-				move_location $old_location $_direction
-				_new_location=$new_location
-			fi
+		case $_direction in
 
-		else
-			if [ ! "$(ls $HOME$old_location | grep $_direction)" = "" ]
-			then
-				move_location $old_location $_direction
-				_new_location=$new_location
-			else
-				echo "No such a directorie"
-				_new_location=$old_location
-			fi
-		fi
+			'..')
+
+				if [ "$old_location" != "/rvsh" ]
+				then
+					move_location $old_location $_direction
+					_new_location=$new_location
+				fi
+				;;
+
+			*   )
+
+				if [ ! "$(ls $HOME$old_location | grep $_direction)" = "" ]
+				then
+					if [ -d $HOME$old_location/$_direction ]
+					then
+						move_location $old_location $_direction
+						_new_location=$new_location
+					else
+						echo "$_direction : not a directory"
+					fi
+				else
+					echo "No such a directorie"
+					_new_location=$old_location
+				fi
+				;;
+		esac
+
 	else
-		if [ "$_direction" = ".." ]
-		then
 
-			if [ "$old_location" != "/$type_of_user" ]
-			then
-				move_location $old_location $_direction
-				_new_location=$new_location
-			fi
-		else
-			if [ ! "$(ls $HOME/rvsh$old_location | grep $_direction)" = "" ]
-			then
-				move_location $old_location $_direction
-				_new_location=$new_location
-			else
-				echo "No such a directorie"
-				_new_location=$old_location
-			fi
-		fi
+		case $_direction in
+
+			'..')
+
+				if [ "$old_location" != "/$type_of_user" ]
+				then
+					move_location $old_location $_direction
+					_new_location=$new_location
+				fi
+				;;
+
+			*   )
+
+				if [ ! "$(ls $HOME/rvsh$old_location | grep $_direction)" = "" ]
+				then
+					if [ -d $HOME$/rvsh$old_location/$_direction ]
+					then
+						move_location $old_location $_direction
+						_new_location=$new_location
+					else
+						echo "$_direction : not a directory"
+					fi
+				else
+					echo "No such a directorie"
+					_new_location=$old_location
+				fi
+				;;
+
+		esac
 	fi
 
 }

@@ -82,6 +82,17 @@ del_user() {
         then 
             rm -r $ROOT/users/$1
             echo -e "The user $1 has been removed."
+
+            hostL=$(ls $ROOT/host)
+
+            for i in $hostL
+            do
+                if [ -d $ROOT/host/$i/$1 ]
+                then
+                    rm -r $ROOT/host/$i/$1
+                fi
+            done
+
         else
             echo -e "The user $1 doesn't exist."
         fi
@@ -188,6 +199,7 @@ grant_host_access() {
                 echo "(grant access) $host_to_add already added."
             else
                 echo "$host_to_add" >> $ROOT/users/$user_to_grant/hostlist 
+                mkdir $ROOT/host/$host_to_add/$user_to_grant
                 echo "(grant access) $host_to_add added succesfully."
             fi
         fi
@@ -216,7 +228,8 @@ revoke_host_access() {
             if $(grep $host_to_del $ROOT/users/$user_to_revoke/hostlist > /dev/null); then
                 
                 file_content=$(cat $ROOT/users/$user_to_revoke/hostlist | sed /$host_to_del/d)
-                echo $file_content > $ROOT/users/$user_to_revoke/hostlist
+                echo "$file_content" > $ROOT/users/$user_to_revoke/hostlist
+                rm -r $ROOT/host/$host_to_del/$user_to_revoke
                 echo "(revoke access) $host_to_del deleted succesfully."
 
             else
