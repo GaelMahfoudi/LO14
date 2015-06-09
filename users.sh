@@ -105,12 +105,14 @@ change_password() {
     if [ -d $ROOT/users/$1 ]
     then
 
-        while [ "$pass" = "" ]
-        do
-            read -p "Enter the new password for $1 : " -s pass
-            echo ""
-        done
+        read -p "(password) Enter the new password for $1 : " -s pass
+        echo ""
         
+        if [ -z "$pass" ]; then
+            echo "(password) password unchanged for $1"
+            return
+        fi
+
         echo "$pass" | md5sum | cut -d ' ' -f1 > $ROOT/users/$1/password
 
     else
@@ -136,16 +138,13 @@ change_name() {
         then
 
             local username=$1
-        
             local newname=""
         
-            while [ "$newname" = "" ]
-            do
-                read -p "Enter the new name for $username: " newname
-            done
-        
+            read -p "(new name) for $username: " newname
+
             
-            if [ "$newname" = "$username" ]; then
+            if [ "$newname" = "$username" ] || [ -z "$newname" ]; then
+                echo "(new name) name unchanged for $username"
                 return
             fi
 
@@ -170,95 +169,65 @@ change_name() {
 # DESCRIPTION : Ajoute l'accès à la machine spécifiée.
 # PARAMETER $1: L'utilisateur qui aura l'accès.
 # =====================================================================
-add_access_host() {
+grant_host_access() {
 
-    
-    if [ ! -d $ROOT/users/$1 ]; then
-        echo "User $1 does not exist"
-        return
-    fi
+    local user_to_grant=$1
 
-    if [ ! -e $ROOT/users/$1/hostlist ]
-    then
-        touch $ROOT/users/$1/hostlist
-    fi
+    if [ -d $ROOT/users/$user_to_grant ] || [ "$user_to_grant" = "admin" ]; then
+        
+        read -p "(grant access) enter the hostname: " host_to_add
 
-    local hostL=$(cat $ROOT/users/$1/hostlist) 
-    local newhost=""
-
-    if [ ! "$1" = "admin" ]
-    then
-
-        local newhost=""
-
-
-        if [ "$hostL" = "" ]
-        then
-            echo "The user $1 has no host in his list"
-            while [ "$newhost" = "" ]
-            do
-                read -p "Enter the new accessible host for $1: " newhost
-                if [ ! -d  $ROOT/host/$newhost ]; then
-                    echo "$newhost does not exists."
-                    newhost=""
-                fi
-            done
-            echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
-            mkdir $ROOT/host/$newhost/$1
+        if [ ! -d $ROOT/host/$host_to_add ] || [ -z $host_to_add ]; then
+            echo "(grant access) host $host_to_add does not exist"
+            
         else
 
-            j=1
-            for i in $hostL
-            do
-                echo "$j) $i"
-                j=$(($j+1))
-            done
+            # on verifie si l'hotes n'est pas encore dans le fichier
 
-            choice=""
-            while [ ! \( "$choice" = "add" -o "$choice" = "del"  -o "$choice" = "quit" \) ]
-            do
-                echo -en "\r                                                                      \r"
-                echo -en "Would you like to add or del one ? (add/del/quit) : "
-                read choice
-            done
-
-            if [ "$choice" = "add" ]
-            then
-                while [ "$newhost" = "" ]
-                do
-                    read -p "Enter the new accessible host for $1: " newhost
-                    if [ ! -d  $ROOT/host/$newhost ]; then
-                        echo "$newhost does not exists."
-                        newhost=""
-                    fi
-                done
-                echo -e "$newhost\n" >> $ROOT/users/$1/hostlist
-                mkdir $ROOT/host/$newhost/$1
+            if $(grep $host_to_add $ROOT/users/$user_to_grant/hostlist > /dev/null); then
+                echo "(grant access) $host_to_add already added."
             else
-                if [ "$choice" = "del" ]
-                then
-                    read -p "Which one would you like to remove ? (enter the number) : " hostToDel
-                    ind=$(($hostToDel-1))
-                    list=($hostL)
-                    hostToDel=${hostToDel}'d'
-                    tmp=$(cat $ROOT/users/$1/hostlist | sed s/$hostToDel//d)
-                    rm $ROOT/users/$1/hostlist
-                    touch $ROOT/users/$1/hostlist
-                    rm -r $ROOT/host/${list[$ind]}/$1
-
-                    for k in $tmp
-                    do
-                        if [ "$k" != "" ]
-                        then
-                            echo -e "$k" >> $ROOT/users/$1/hostlist
-                        fi
-                    done
-                fi
+                echo "$host_to_add" >> $ROOT/users/$user_to_grant/hostlist 
+                echo "(grant access) $host_to_add added succesfully."
             fi
         fi
+
     else
-        echo "You can't add host to the administrator"
+        echo "Can't grant access for $user_to_grant"
     fi
+
+}
+
+revoke_host_access() {
+    
+    local user_to_revoke=$1
+
+    if [ -d $ROOT/users/$user_to_revoke ] || [ "$user_to_grant" = "admin" ]; then
+        
+        read -p "(revoke access) enter the hostname: " host_to_del
+
+        if [ ! -d $ROOT/host/$host_to_del ] || [ -z $host_to_del ]; then
+            echo "(revoke access) host $host_to_del does not exist"
+            
+        else
+
+            # on verifie si l'hotes n'est pas encore dans le fichier
+
+            if $(grep $host_to_del $ROOT/users/$user_to_revoke/hostlist > /dev/null); then
+                
+                file_content=$(cat $ROOT/users/$user_to_revoke/hostlist | sed /$host_to_del/d)
+                echo $file_content > $ROOT/users/$user_to_revoke/hostlist
+                echo "(revoke access) $host_to_del deleted succesfully."
+
+            else
+                echo "(revoke access) $host_to_del has not been added yet."
+            fi
+        fi
+
+    else
+        echo "Can't revoke access for $user_to_revoke"
+    fi
+
 }
 
 
@@ -275,14 +244,13 @@ help_users() {
     echo "  -l         list all users"
     echo "  -h         show this help and quit"
     echo "  -a <usr>   add user"
-    echo "  -r <usr>   remove user"
+    echo "  -d <usr>   delete user"
     echo "  -p <usr>   change user password"
     echo "  -n <usr>   change user name"
-    echo "  -m <usr>   change user access list"
+    echo "  -g <usr>   grant user access to host"
+    echo "  -r <usr>   revoke user access to host"
     echo ""
 }
-
-
 
 
 # ====  USERS  ========================================================
@@ -296,14 +264,15 @@ users() {
 
     local OPTIND
     
-    getopts "a:r:p:n:m:lh" OPTION
+    getopts "a:d:p:n:g:r:m:lh" OPTION
     
     case "$OPTION" in
         "a" ) add_user $OPTARG;;
-        "r" ) del_user $OPTARG;;
+        "d" ) del_user $OPTARG;;
         "p" ) change_password $OPTARG;;
         "n" ) change_name $OPTARG;;
-        "m" ) add_access_host $OPTARG;;
+        "g" ) grant_host_access $OPTARG;;
+        "r" ) revoke_host_access $OPTARG;;
         "l" ) user_list;;
         "h" ) help_users;;
         * ) help_users;;
