@@ -1,8 +1,8 @@
 #===================================================================================
-# file         : who.sh
+# file         : lsc.sh
 # usage        : ---
 #
-# description  : fichier source de la commande who.
+# description  : fichier source de la commande lsc.
 #
 # options      : ---
 # authors      : G. MAHFOUDI & S. JUHEL
@@ -21,34 +21,36 @@ source who.sh
 ROOT="/home/rvsh"
 
 
-help_whoison() {
-	echo "usage: whoison [host | all]"
+help_lsc() {
+	echo "usage: lsc [-ham] "
 	echo ""
-	echo "  host  users on the host machine"
-	echo "  all     users on all machines"
+	echo "  -h          show this help and quit."
+	echo "  -a          list connected users on all host"
+	echo "  -m <host>   list connected users on host"
 	echo ""
 }
 
 
+
 #=== function ======================================================================
-# name         : whoison
+# name         : lsc
 # description  : permet d'acceder à l'ensemble des utilisateurs connectés sur
-#                une machine virtuelle spécifiée. 
+#                une machine virtuelle spécifiée ou sur toutes celles
+# 				 du réseau. 
 #
 # parameters   :
 # $1 - nom de la machine virtuelle
 #===================================================================================
-whoison() {
+lsc() {
+    
+    local OPTIND
+    
+    getopts "am:h" opt
 
-	local hostname="$1"
-
-	if [ -z "$hostname" ]; then
-		help_whoison
-	elif [ "$hostname" = "all" ]; then
-		rusers
-	elif [ ! -d $ROOT/host/$hostname ]; then	
-		echo "Host $hostname does not exists"
-	else
-		who_is_connected_on $hostname
-	fi
+    case "$opt" in
+        "h" ) help_lsc;;
+        "a" ) rusers;;
+        "m" ) who_is_connected_on $OPTARG;;
+         *  ) help_lsc;;
+    esac
 }

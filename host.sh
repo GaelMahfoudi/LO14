@@ -27,12 +27,12 @@ ROOT="$HOME/rvsh"
 # DESCRIPTION : Liste des machines existants.
 # PARAMETER   : Pas de paramètre.
 # =====================================================================
-
 host_list() {
     
     list=$(ls $ROOT/host/)
+
     if [ -z "$list" ]; then
-        echo "No VMs created"
+        echo "No host created"
     else
         echo "$list"
     fi
@@ -45,7 +45,6 @@ host_list() {
 # DESCRIPTION : Ajoute une machine.
 # PARAMETER $1: Nom de la nouvelle machine.
 # =====================================================================
-
 add_host() {
 
     if [ ! -d $ROOT/host/$1 ]; then 
@@ -64,9 +63,9 @@ add_host() {
 # DESCRIPTION : Supprime une machine existant.
 # PARAMETER $1: Nom de la machine à supprimer.
 # =====================================================================
-
 del_host() {
     if [ -d $ROOT/host/$1 ]; then 
+        
         rm -r $ROOT/host/$1
         echo -e "The host $1 has been removed."
 
@@ -74,6 +73,10 @@ del_host() {
 
         for i in $userlist
         do
+
+            [ "$i" = "admin" ] && continue
+
+
             newHostlist=$(cat $ROOT/users/$i/hostlist)
             rm $ROOT/users/$i/hostlist
             touch $ROOT/users/$i/hostlist
@@ -99,7 +102,6 @@ del_host() {
 # DESCRIPTION : Affiche l'aide de la fonction host.
 # PARAMETER   : Pas de paramètre.
 # =====================================================================
-
 help_host() {
 
     echo "usage: host [-arlh]"
@@ -119,7 +121,6 @@ help_host() {
 #               fonctions appropriées.
 # PARAMETER $1: Liste de arguments.
 # =====================================================================
-
 host() {
     
     if [ ! -d $ROOT/host ]; then 
@@ -137,5 +138,4 @@ host() {
         "h" ) help_host;;
          *) help_host;;
     esac
-
 }
