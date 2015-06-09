@@ -48,7 +48,7 @@ source cd.sh
 source host.sh
 source users.sh
 source afinger.sh
-source whoison.sh
+source lsc.sh
 #=== end includes ==================================================================
 
 
@@ -80,8 +80,7 @@ cd: change de repertoire
 mkdir: cree un repertoire
 rmdir: supprime un repertoire 
 pwd: affiche le repertoire courant
-whoison: affiche tout les utilisateur connectes à une machine 
-access: affiche la liste des accès aux machines pour chaques utilisateurs:
+lsc: affiche tout les utilisateur connectes à une machine 
 host: ajoute/enleve une machine du reseau virtuel
 users: ajoute/enleve un utilisateur du reseau virtuel
 afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.help/admincmd
@@ -496,8 +495,8 @@ handle_admin_cmd() {
             echo "[!] commande en dev"
             ;;
 
-        'whoison')
-            whoison $param
+        'lsc')
+            lsc $param
             ;;
 
         'afinger')

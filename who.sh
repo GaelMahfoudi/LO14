@@ -34,20 +34,31 @@ who_is_connected_on() {
 	
 	if [ ! -d $ROOT/host/$hostname ]; then
 		echo "Host $hostname does not exist"
-	done
-
-	printf "host: $hostname:\n"
-	printf "%-12s %-9s %-9s\n" "user" "hour" "date"
-	echo   "------------ --------  --------"
-
-	# on parcours l'ensemble des fichiers de connexion de la
-	# machine virtuelle
-	for conn in $(ls $ROOT/host/$hostname/*.tmp  2> /dev/null); do
-
-		# affichage formate des connexions trouvees dans le fichier
-		cat $conn | awk -F',' '{printf "%-12s %-9s %-9s\n", $1, $2, $3	}'
-		printf "\n"
 		
-	done
+	else
 
+		
+		# on parcours l'ensemble des fichiers de connexion de la
+		# machine
+
+		ret=$(ls $ROOT/host/$hostname/*.tmp 2> /dev/null)
+		if [ -z "$ret" ]; then
+			return
+		else
+
+			printf "(host) $hostname\n"
+			printf "%-12s %-9s %-9s\n" "user" "hour" "date"
+			echo   "------------ --------  --------"
+
+			for conn in $ret; do
+
+				# affichage formate des connexions trouvees dans le fichier
+				cat $conn | awk -F',' '{printf "%-12s %-9s %-9s\n", $1, $2, $3}'
+				
+			done
+			
+		fi
+
+		printf "\n"
+	fi
 }

@@ -24,8 +24,8 @@ ROOT="/home/rvsh"
 help_lsc() {
 	echo "usage: lsc [-ham] "
 	echo ""
-	echo "  -h 			show this help and quit."
-	echo "  -a 			list connected users on all host"
+	echo "  -h          show this help and quit."
+	echo "  -a          list connected users on all host"
 	echo "  -m <host>   list connected users on host"
 	echo ""
 }
