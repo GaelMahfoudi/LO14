@@ -23,7 +23,7 @@ NC='\e[0m'       		# Text Reset
 
 
 
-# ==== FUNCTION =======================================================
+# ==== PRINT_MSG ======================================================
 #
 #        NAME : print_msg
 # DESCRIPTION : Affiche les messages reçus par l'utilisateurs.
@@ -49,7 +49,7 @@ print_msg() {
 #Vérifie si l'utilisateur a reçu un ou plusieurs messages.
 # $1 : Nom de l'utilisateur
 
-# ==== FUNCTION =======================================================
+# ==== CHECK_MSG ======================================================
 #
 #        NAME : check_msg
 # DESCRIPTION : Vérifie si l'utilisateur a de nouveaux messages.
