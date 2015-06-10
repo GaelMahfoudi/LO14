@@ -31,17 +31,17 @@ NC='\e[0m'       # Text Reset
 
 print_msg() {
 
-	local msgList=$(ls $ROOT/users/$1/msg)
-	local msgCount=($msgList)
+	local msg=""							#Le contenu du message à afficher
+	local name=""							#Le nom de la personne qui a envoyé le message
 
-	local msg=""
+	#On parcoure les fichiers messages pour les afficher
 	for i in $(ls $ROOT/users/$1/msg)
 	do
-		name=$(echo $i | awk -F "." '{print $1}')
+		name=$(echo $i | awk -F "." '{print $1}')				#On récupère le nom de l'envoyeur
 		echo -en "${YELLOW}Message from $name : $NC"
-		msg=$(cat $ROOT/users/$1/msg/$i)
+		msg=$(cat $ROOT/users/$1/msg/$i)						#On récupère le contenu du message
 		echo -e "$msg"
-		rm $ROOT/users/$1/msg/$i
+		rm $ROOT/users/$1/msg/$i 								#On supprime le message
 	done
 
 }
@@ -59,18 +59,19 @@ print_msg() {
 
 check_msg() {
 
+	#On vérifie que le dossier de message existe. Si non on le crée.
 	if [ ! -d $ROOT/users/$1/msg/ ]
 	then
 		mkdir $ROOT/users/$1/msg/
 	fi
 
-	local msgList=$(ls $ROOT/users/$1/msg)
-	local msgCount=($msgList)
+	local msgList=$(ls $ROOT/users/$1/msg)				#La liste des messages
+	local msgCount=($msgList)							#La liste des messages sous forme de tableau
 
-	if [ "$msgList" != "" ]
+	if [ "$msgList" != "" ]								#Si la liste des messages n'est pas vide
 	then
-		echo -e "You have $YELLOW${#msgCount[@]}$NC new messages : "
-		print_msg $1
+		echo -e "You have $YELLOW${#msgCount[@]}$NC new messages : "		#On affiche le nombre de message reçu
+		print_msg $1														#On les affiche
 	fi
 }
 
