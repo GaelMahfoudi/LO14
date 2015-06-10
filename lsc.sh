@@ -1,26 +1,41 @@
-#===================================================================================
-# file         : lsc.sh
-# usage        : ---
+# =====================================================================
 #
-# description  : fichier source de la commande lsc.
+#           FILE : lsc.sh
 #
-# options      : ---
-# authors      : G. MAHFOUDI & S. JUHEL
-# company      : UTT
-# version      : 1.0
-# bugs         : ---
-# notes        : ---
-# created      : ---
-# revision     : ---
-#===================================================================================
+#          USAGE : ---
+#
+#    DESCRIPTION : fichier source de la commande lsc
+#
+#
+#         OPTION : voir la fonction help_lsc
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
+# =====================================================================
+
+
+# === INCLUDES ========================================================
 
 source rusers.sh
 source who.sh
 
-# repertoire racine de rvsh
-ROOT="/home/rvsh"
+# =====================================================================
 
 
+# === GLOBAL VARIABLES ================================================
+
+ROOT="$HOME/rvsh"
+
+# =====================================================================
+
+
+# === FUNCTION ========================================================
+#
+#        name: help_lsc
+# description: affiche l'aide en ligne de la commande 'lsc'
+# 
+#  parameters: ---
+#
+# =====================================================================
 help_lsc() {
 	echo "usage: lsc [-ham] "
 	echo ""
@@ -31,16 +46,16 @@ help_lsc() {
 }
 
 
-
-#=== function ======================================================================
-# name         : lsc
-# description  : permet d'acceder à l'ensemble des utilisateurs connectés sur
-#                une machine virtuelle spécifiée ou sur toutes celles
-# 				 du réseau. 
+# === FUNCTION ========================================================
 #
-# parameters   :
-# $1 - nom de la machine virtuelle
-#===================================================================================
+#        name: lsc
+# description: permet à l'administrateur d'afficher les utilisateurs
+#              connectés sur une machines ou sur toutes les machines 
+#              du réseau.
+# 
+#  parameters: ---
+#
+# =====================================================================
 lsc() {
     
     local OPTIND
@@ -49,8 +64,11 @@ lsc() {
 
     case "$opt" in
         "h" ) help_lsc;;
-        "a" ) rusers;;
-        "m" ) who_is_connected_on $OPTARG;;
+        "a" ) rusers;;                      # on affiche qui est connecté sur toute les machines.
+        "m" ) who_is_connected_on $OPTARG;; # on affiche qui est connecté sur la machine spécifiée
          *  ) help_lsc;;
     esac
 }
+
+
+# === END OF FILE =====================================================

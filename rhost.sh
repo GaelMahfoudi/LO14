@@ -1,39 +1,44 @@
-#===================================================================================
-# file         : rhost.sh
-# usage        : ---
+# =====================================================================
 #
-# description  : fichier source de la commande rhost.
+#           FILE : rhost.sh
 #
-# options      : ---
-# authors      : G. MAHFOUDI & S. JUHEL
-# company      : UTT
-# version      : 1.0
-# bugs         : ---
-# notes        : ---
-# created      : ---
-# revision     : ---
-#===================================================================================
+#          USAGE : ---
+#
+#    DESCRIPTION : fichier source de la commande rhost
+#
+#
+#         OPTION : ---
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
+# =====================================================================
 
 
-# repertoire racine de rvsh
+# === GLOBAL VARIABLES ================================================
+
 ROOT="$HOME/rvsh"
 
+# =====================================================================
 
-#=== function ======================================================================
-# name         : rhost
-# description  : permet d'acceder à la liste des machines 
-#				 rattachées au réseau virtuel.
+
+# === FUNCTION ========================================================
+#
+#        name: rhost
+# description: permet d'acceder à la liste des machines rattachées
+#              au réseau virtuel.
 # 
-# parameters   : ---
-#===================================================================================
+#  parameters: ---
+#
+# =====================================================================
 rhost() {
 
 	echo "Hosts available on the network:"
 
-	# on liste le repertoire qui contients les machines
+	# on recupere la liste des machines du repertoire
+    # des machines
 	list=$(ls $ROOT/host/)
 
-	# si le repertoire est vide, on le précise
+
+	# le repertoire est vide
     if [ -z "$list" ]; then
         echo "No hosts created"
         
@@ -43,3 +48,5 @@ rhost() {
     fi
 
 }
+
+# === END OF FILE =====================================================

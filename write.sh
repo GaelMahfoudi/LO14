@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # =====================================================================
 #
 #			FILE : write.sh
@@ -11,14 +9,18 @@
 #
 #		  OPTION : voir la fonction help_write
 #		  AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
 # =====================================================================
 
 
+# === GLOBAL VARIABLES ================================================
 
 ROOT="$HOME/rvsh"
 
+# =====================================================================
 
-# ====  WRITE  ========================================================
+
+# ==== FUNCTION =======================================================
 #
 #		 NAME : write
 # DESCRIPTION : Envoi un message à l'utilisateur spécifié.
@@ -26,7 +28,6 @@ ROOT="$HOME/rvsh"
 #				"utilisateur@vm" puis le reste est le message à envoyer
 #			$2: Nom de l'utilisateur qui envoie le message.
 # =====================================================================
-
 write() {
 
 	cible=($1)
@@ -46,3 +47,6 @@ write() {
 	echo -e $msg > $ROOT/users/$cible/msg/$sender
 
 }
+
+
+# === END OF FILE =====================================================

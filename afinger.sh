@@ -1,5 +1,3 @@
-#!/bin/bash 
-
 # =====================================================================
 #
 #           FILE : afinger.sh
@@ -12,17 +10,24 @@
 #
 #         OPTION : voir fonction help_afinger.
 #         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
 # =====================================================================
+
+
+# === GLOBAL VARIABLES ================================================
 
 ROOT="$HOME/rvsh"
 
-# ====  ADD_PHONE  ====================================================
+# =====================================================================
+
+
+# ==== FUNCTION =======================================================
 #
 #        NAME : add_phone
 # DESCRIPTION : Permet d'ajouter/supprimer un tel pour l'utilisateur.
 # PARAMETER $1: L'utilisateur à modifier.
+#
 # =====================================================================
-
 function add_phone {
 
     if [ ! -e $ROOT/users/$1/phones ]
@@ -80,13 +85,13 @@ function add_phone {
 }
 
 
-# ====  ADD_MAIL  ====================================================
+# ==== FUNCTION =======================================================
 #
 #        NAME : add_mail
 # DESCRIPTION : Permet d'ajouter/supprimer un mail pour l'utilisateur.
 # PARAMETER $1: L'utilisateur à modifier.
+#
 # =====================================================================
-
 function add_mail {
 
     if [ ! -e $ROOT/users/$1/mails ]
@@ -141,6 +146,14 @@ function add_mail {
 }
 
 
+# ==== FUNCTION =======================================================
+#
+#        NAME : afinger
+# DESCRIPTION : Effectue le parsage des arguments et appelle les
+#               fonctions appropriées.
+# PARAMETER $1: Liste des arguments
+#
+# =====================================================================
 help_afinger() {
 
     echo "usage: afinger [-mth]"
@@ -153,14 +166,15 @@ help_afinger() {
 
 }
 
-# ====  AFINGER  ======================================================
+
+# ==== FUNCTION =======================================================
 #
 #        NAME : afinger
 # DESCRIPTION : Effectue le parsage des arguments et appelle les
 #               fonctions appropriées.
 # PARAMETER $1: Liste des arguments
+#
 # =====================================================================
-
 function afinger  {
     
 

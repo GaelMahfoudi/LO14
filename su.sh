@@ -1,52 +1,59 @@
-#===================================================================================
-# file         : su.sh
-# usage        : ---
+# =====================================================================
 #
-# description  : fichier source de la commande su.
+#           FILE : su.sh
 #
-# options      : ---
-# authors      : G. MAHFOUDI & S. JUHEL
-# company      : UTT
-# version      : 1.0
-# bugs         : ---
-# notes        : ---
-# created      : ---
-# revision     : ---
-#===================================================================================
+#          USAGE : ---
+#
+#    DESCRIPTION : fichier source de la commande su
+#
+#
+#         OPTION : voir fonction help_switch_user.
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
+# =====================================================================
 
 
-#=== includes ======================================================================
+# === INCLUDES ========================================================
 
 source handle_connections.sh
 
-#=== end includes ================================================================== 
+# =====================================================================
 
 
-# repertoire racine de rvsh
+# === GLOBAL VARIABLES ================================================
+
 ROOT="$HOME/rvsh"
 
+# =====================================================================
 
-#=== function ======================================================================
-# name         : help_switch_user
-# description  : affiche l'aide en ligne de la commande `switch_user'
+
+# === FUNCTION ========================================================
+#
+#        name: help_switch_user
+# description: affiche l'aide en ligne de la commande 'switch_user'
 # 
-# parameters   : ---
-#===================================================================================
+#  parameters: ---
+#
+# =====================================================================
 help_switch_user() {
 
 	echo "usage: su <user>"
+	echo "    su allow you to switch user on the host"
 	echo ""
 
 }
 
-#=== function ======================================================================
-# name         : switch_user
-# description  : permet de changer d'utilisateur
+
+# === FUNCTION =========================================================
 #
-# parameters   :
-# $1 - le nom du nouvel utilisateur
-# $2 - le nom de la machine courante
-#===================================================================================
+#        name: switch_user
+# description: permet de changer d'utilisateur
+#
+#  parameters:
+# 	$1 - le nom du nouvel utilisateur
+# 	$2 - le nom de la machine courante
+#
+# ======================================================================
 switch_user() {
 
 	local hostname="$1"
@@ -57,7 +64,7 @@ switch_user() {
 
 		help_switch_user
 
-	# si l'utilisateur entré n'existe pas
+	# si l'utilisateur rentre n'existe pas 
 	elif [ ! -d $ROOT/users/$username ]; then
 
 		echo "Error: can not connect as $username user unknown"
@@ -65,21 +72,27 @@ switch_user() {
 	# sinon
 	else
 
-		# on se connecte en tant que nouvel utilisateur sur la meme machine
-		# puis on ecrit les logs de connexion
-		# puis on gère la nouvelle ligne de commande
+		# selon qu'on soit admin ou utilisateur:
+		# > on se connecte en tant que nouvel admin/utilisateur sur la meme machine
+		# > puis on ecrit les logs de connexion
+		# > puis on gère la nouvelle ligne de commande
+		if [ "$username" = "admin" ]; then
 
-		if [ "$username" = "admin" ]
-		then
 			connect "$username" "rvsh" && \
 			write_logs "$username" "rvsh" "connected" && \
         	handle_admin_cmd 
+		
 		else
+		
 			connect "$username" "$hostname" && \
 			write_logs "$username" "$hostname" "connected" && \
         	handle_users_cmd "$username" "$hostname" "$(date +%T)"
-		fi
 		
+		fi
     
     fi
+
 }
+
+
+# === END OF FILE =====================================================

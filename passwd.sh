@@ -1,32 +1,34 @@
-#===================================================================================
-# file         : passwd.sh
-# usage        : ---
+# =====================================================================
 #
-# description  : fichier source de la commande passwd.
+#           FILE : rusers.sh
 #
-# options      : ---
-# authors      : G. MAHFOUDI & S. JUHEL
-# company      : UTT
-# version      : 1.0
-# bugs         : ---
-# notes        : ---
-# created      : ---
-# revision     : ---
-#===================================================================================
+#          USAGE : ---
+#
+#    DESCRIPTION : fichier source de la commande rusers
+#
+#
+#         OPTION : ---
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
+# =====================================================================
 
 
-# repertoire racine de rvsh
+# === GLOBAL VARIABLES ================================================
+
 ROOT="$HOME/rvsh"
 
+# =====================================================================
 
-#=== function ======================================================================
-# name         : change_users_passwd
-# description  : permet à l'utilisateur de changer de mot de passe sur l'ensemble
-#       		 du réseau virtuel 
+
+# === FUNCTION ========================================================
+#
+#        name: change_users_passwd
+# description: permet de changer de mot de passe sur l'ensemble du
+#			   réseau virtuel
 # 
-# parameters   :
-# $1 - le nom de l'utilisateur qui désire changer son mot de passe
-#===================================================================================
+#  parameters: 
+# 	$1 - le nom de l'utilisateur qui désire changer son mot de passe
+# =====================================================================
 change_users_passwd() {
 
 	local username="$1" 										# utilisateur qui veux changer son mot de passe
@@ -65,3 +67,5 @@ change_users_passwd() {
 	echo "Password updated succesfully for $username"
 	
 }
+
+# === END OF FILE =====================================================

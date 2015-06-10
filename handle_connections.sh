@@ -1,4 +1,4 @@
-#===================================================================================
+#======================================================================
 # file         : handle_connections.sh
 # usage        : ---
 #
@@ -16,14 +16,18 @@
 # notes        : ---
 # created      : ---
 # revision     : ---
-#===================================================================================
+#======================================================================
 
 
-# repertoire racine de rvsh
+# === GLOBAL VARIABLES ================================================
+
 ROOT="$HOME/rvsh"
 
+# =====================================================================
 
-#=== function ======================================================================
+
+# === FUNCTION ========================================================
+#
 # name         : authentification
 # description  : gere l'authentification des utilisateurs 
 #                i.e demande de mot de passe lors de la connexion
@@ -34,7 +38,8 @@ ROOT="$HOME/rvsh"
 # returns      :
 # 0 - connexion autorisée
 # 1 - connexion refusée 
-#===================================================================================
+#
+# =====================================================================
 authentification() {
 
     local username="$1"                                     # nom utilisateur
@@ -48,6 +53,7 @@ authentification() {
         echo ""
 
         # si il entre le mauvais mdp
+        # on quitte la fonction en mode erreur.
         [ ! "$(echo "$pass" | md5sum | cut -d' ' -f1 )" = "$userpass" ] && return 1 || return 0
 
     # si l'utilisateur n'a pas de mdp, on lui autorise la connexion
@@ -57,7 +63,8 @@ authentification() {
 }
 
 
-#=== function ======================================================================
+# === FUNCTION ========================================================
+#
 # name         : write_logs
 # description  : fonction de journalisation des connexions au seins
 #                du réseau virtuel
@@ -68,8 +75,9 @@ authentification() {
 #
 # returns      :
 # 0 - connexion autorisée
-# 1 - connexion refusée 
-#===================================================================================
+# 1 - connexion refusée
+# 
+# =====================================================================
 write_logs() {
 
     local username="$1"     # nom de l'utilisateur
@@ -96,7 +104,8 @@ write_logs() {
 } 
 
 
-#=== function ======================================================================
+# === FUNCTION ========================================================
+#
 # name         : push_user_connexion
 # description  : permet d'ajouter une connexion utilisateur a une machine.
 #                cette connexion se situe dans la machine dans un fichier
@@ -106,7 +115,8 @@ write_logs() {
 # parameters   :
 # $1 - le nom de l'utilisateur qui se connecte
 # $2 - la machine de l'utilisateur
-#===================================================================================
+#
+# =====================================================================
 push_user_connexion() {
 
     local username="$1"
@@ -125,7 +135,8 @@ push_user_connexion() {
 }
 
 
-#=== function ======================================================================
+# === FUNCTION ========================================================
+#
 # name         : pop_user_connexion
 # description  : permet de mettre a jour le fichier de connexion utilisateur 
 #                a une machine.
@@ -134,7 +145,8 @@ push_user_connexion() {
 # $1 - le nom de l'utilisateur qui se connecte
 # $2 - la machine de l'utilisateur
 # $3 - l'heure de la connexion
-#===================================================================================
+#
+# =====================================================================
 pop_user_connexion() {
 
     local username="$1"
@@ -160,7 +172,8 @@ pop_user_connexion() {
 }
 
 
-#=== function ======================================================================
+#=== FUNCTION =========================================================
+#
 # name         : connect
 # description  : gere la connexion d'un utilisateur à une machine.
 #                
@@ -170,7 +183,8 @@ pop_user_connexion() {
 #
 # returns      :
 # 1 - connexion refusée
-#===================================================================================
+#
+#======================================================================
 connect() {
     
     local username="$1"
@@ -236,7 +250,8 @@ connect() {
 }
 
 
-#=== function ======================================================================
+# === FUNCTION ========================================================
+#
 # name         : disconnect
 # description  : gere la deconnexion d'un utilisateur à une machine.
 #                
@@ -244,7 +259,8 @@ connect() {
 # $1 - le nom de l'utilisateur
 # $2 - la machine de l'utilisateur
 # $3 - l'heure de connexion de l'utilisateur 
-#===================================================================================
+#
+# =====================================================================
 disconnect() {
 
     local username="$1"
@@ -264,3 +280,5 @@ disconnect() {
     write_logs "$username" "$hostname" "disconnected"
 
 }
+
+# === END OF FILE =====================================================
