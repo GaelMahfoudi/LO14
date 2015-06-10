@@ -29,37 +29,41 @@
 # revision     : ---
 #===================================================================================
 
+# === INCLUDES ========================================================
 
-#=== includes ======================================================================
-source handle_connections.sh
+# admin
+source commands/admin/afinger.sh
+source commands/admin/users.sh
+source commands/admin/host.sh
+source commands/admin/lsc.sh
 
-source connect.sh
-source passwd.sh
-source rhost.sh
-source su.sh
-source passwd.sh
-source who.sh
-source rusers.sh
-source write.sh
-source msg.sh
-source finger.sh
-source cd.sh
-source rvsh_ls.sh
-source rvsh_mkdir.sh
-source rvsh_rm.sh
+# shared
+source commands/shared/cd.sh
+source commands/shared/handle_connections.sh
+source commands/shared/rvsh_ls.sh
+source commands/shared/rvsh_mkdir.sh
+source commands/shared/rvsh_rm.sh
 
-source host.sh
-source users.sh
-source afinger.sh
-source lsc.sh
-#=== end includes ==================================================================
+# users
+source commands/users/connect.sh
+source commands/users/finger.sh
+source commands/users/msg.sh
+source commands/users/passwd.sh
+source commands/users/rhost.sh
+source commands/users/rusers.sh
+source commands/users/su.sh
+source commands/users/who.sh
+source commands/users/write.sh
 
-
-# Reset
-NC='\e[0m'       # Text Reset
+# =====================================================================
 
 
-# Regular Colors
+# === GLOBAL VARIABLES ================================================
+
+ROOT="$HOME/rvsh"
+
+
+NC='\e[0m'              # Text Reset
 BLACK='\e[0;30m'        # Black
 RED='\e[0;31m'          # Red
 GREEN='\e[0;32m'        # Green
@@ -69,104 +73,16 @@ PURPLE='\e[0;35m'       # Purple
 CYAN='\e[0;36m'         # Cyan
 WHITE='\e[0;37m'        # White
 
-
-ROOT="$HOME/rvsh"
-
-
-make_help() {
-
-    # admincmd
-    echo 'Aide des commandes administrateur (tapez <cmd> -h pour plus de precrisions)
-
-ls: liste les fichier du repertoire courant
-cd: change de repertoire
-mkdir: cree un repertoire
-rmdir: supprime un repertoire 
-pwd: affiche le repertoire courant
-lsc: affiche tout les utilisateur connectes à une machine 
-host: ajoute/enleve une machine du reseau virtuel
-users: ajoute/enleve un utilisateur du reseau virtuel
-afinger: renseigne des information complementaire sur un utilisateur' > $ROOT/.help/admincmd
-
-    # userscmd
-    echo 'Aide des commandes utilisateur (tapez <cmd> -h pour plus de precisions)
-
-ls: liste les fichier du repertoire courant
-cd: change de repertoire
-mkdir: cree un repertoire
-rmdir: supprime un repertoire 
-pwd: affiche le repertoire courant
-text: editeur de texte en ligne
-wall: envoie un message a tout le monde.
-who: affiche la liste des utilisateurs connectes sur une VM
-rusers: affiche la liste des utilisateurs connectes au reseau
-rhost: affiche la liste des machines du reseau virtuel
-connect: permet de se connecter a une autre machine
-su: permet de change d utilisateur
-passwd: change le mot de passe de l uitlisateur
-finger: renvoie des elements complementaire sur l utilisateur
-write: envoi un message a un utilisateur connecte' > $ROOT/.help/userscmd
-
-}
+# =====================================================================
 
 
-install() {
-
-    declare -a directories
-    directories[0]='host'               # dossier des VMs
-    directories[1]='users'              # dossier des utilisateurs
-    directories[2]='users/admin'        # dossier administrateur
-    directories[3]='.logs'              # dossier des logs
-    directories[4]='.help'              # dossier de l'aide principale des commandes
-
-
-    echo "[*] installing $(basename $0)..."
-
-    # creation du dossier de partage
-    if [ -d $ROOT ]
-    then
-        echo "install> '$ROOT' already exists..."
-    else
-        echo "install> making home directory in '$ROOT'"
-        mkdir $ROOT
-    fi
-
-    echo -e "install> added directories:"
-    for dir in ${directories[*]}
-    do
-        
-        echo -e "\t'$dir' has been created"
-        mkdir $ROOT/$dir
-            
-    done
-
-    
-    make_help
-    
-    echo "install> root account configuration..." # admin password creation
-    touch $ROOT/users/admin/password
-    echo "6f55b656e660c72e2e38b8a68c598703" > $ROOT/users/admin/password     
-
-    echo "install> guest account configuration..."
-    mkdir $ROOT/users/guest
-    mkdir $ROOT/host/guest
-    touch $ROOT/users/guest/password
-    touch $ROOT/users/guest/hostlist && echo -e "guest\n" > $ROOT/users/guest/hostlist
-
-
-    echo -e "install> Done."
-}
-
-
-uninstall() {
-    echo "[*] uninstall $(basename $0)..."
-    # userdel rvsh         # suppression de l'utilisateur
-    # groupdel rvsh        # suppression du groupe
-    rm -r $ROOT        # suppression de l'architecture personnelle
-    exit
-}
-
-
+# ==== FUNCTION =======================================================
+#
+#        NAME : usage
+# DESCRIPTION : aide de la cli de rvsh
+# PARAMETER   : Pas de paramètre.
+#
+# =====================================================================
 usage() {
 
     echo "Usage: $(basename $0) [--admin | --connect <hostname> <username>]"
@@ -175,7 +91,6 @@ usage() {
     echo "  -a, --admin      log in the virtual machine as administrator"
     echo "  -c, --connect    log in the virtual machine as simple user"
     echo "                   you must specify the hostname and the username."
-    echo "                   (you can connect as a guest, use guest for both username and hostname)"
     echo "  -i, --install    install this program and exit"
     echo "  -u, --uninstall  uninstall this program and exit"
     echo ""
@@ -184,15 +99,60 @@ usage() {
 }
 
 
+# ==== FUNCTION =======================================================
+#
+#        NAME : install
+# DESCRIPTION : installe le programme rvsh
+# PARAMETER   : Pas de paramètre.
+#
+# =====================================================================
+install() {
 
-# ====  READKEY  ======================================================
+    echo "(install) rvsh will be installed in '$ROOT':"
+
+    # on cree le repertoire racine
+    mkdir $ROOT
+
+    # on extrait l'architecture de rvsh dans le 
+    # repertoire racine
+    tar xvzf ./install/arch.tar.gz -C $ROOT/
+
+    # on configure le mot de passe administrateur
+    echo ""
+    read -p "(install) Enter the admin password please: " -s adminpass
+    echo "$(echo "$adminpass" | md5sum | cut -d' ' -f1)" > $ROOT/users/admin/password
+    echo ""
+    echo "(install) Admin password has been set"
+    echo "(install) Done"
+
+    exit 0
+}
+
+
+# ==== FUNCTION =======================================================
+#
+#        NAME : uninstall
+# DESCRIPTION : desinstalle le programme rvsh
+# PARAMETER   : Pas de paramètre.
+#
+# =====================================================================
+uninstall() {
+
+    echo "(uninstall) rvsh will be uninstalled"; sleep 1.5
+    rm -r $ROOT/        # suppression de l'architecture personnelle
+    echo "(uninstall) Done"
+    exit 0
+}
+
+
+# ==== FUNCTION =======================================================
 #
 #        NAME : ReadKey
 # DESCRIPTION : Lis les entrées claviers lettre par lettre, lis le
 #               tampon si un caractère spécial a été saisis.
 # PARAMETER   : Pas de paramètre.
+#
 # =====================================================================
-
 ReadKey() {
     # Wait for first char
     if IFS="" read -n1 _REPLY; then
@@ -204,13 +164,14 @@ ReadKey() {
 }
 
 
-# ====  HISTORY_CMD  ==================================================
+# ==== FUNCTION =======================================================
 #
 #        NAME : history_cmd
 # DESCRIPTION : Gère l'appuie des touches spéciales (haut,bas backspace)
 #               afin de mettre en place le système d'historique de 
 #               commande.
 # PARAMETER   : Pas de paramètre.
+#
 # =====================================================================
 history_cmd() {
 
@@ -338,19 +299,15 @@ handle_users_cmd() {
     local ctime="$3"
     local cmd=""    # commande entree par l'utilisateur
 
-    local user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW}>${NC}"
+    local user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW} >${NC}"
     location="/$username"
     
     while [ "$cmd" != "quit" ]
     do
-        # echo -en "$user_prompt "
-        # read tmp
 
 
-        user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW}>${NC}"
+        user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW} >${NC}"
         history_cmd "$user_prompt"
-
-
 
 
         tmp=$cmd
@@ -365,6 +322,7 @@ handle_users_cmd() {
         case "$cmd" in
 
         'quit' | 'q')
+            
             disconnect "$username" "$hostname" "$ctime"
             return
             ;;
@@ -373,12 +331,13 @@ handle_users_cmd() {
             clear
             ;;
 
-        'cd')
+        'cd') 
             cd $location "$param" "admin"
             location=$_new_location
             ;;
 
         'ls')
+            echo "$location"
             rvsh_ls $location "$param"
             ;;
 
@@ -450,7 +409,7 @@ handle_admin_cmd() {
 
     local cmd=""    # commande entree par l'utilisateur
 
-    local admin_prompt="${BLUE}rvsh:$GREEN$location$BLUE>${NC}"
+    local admin_prompt="${BLUE}rvsh:$GREEN$location$BLUE >${NC}"
     location="/rvsh"
 
     
@@ -458,7 +417,7 @@ handle_admin_cmd() {
         # echo -en "$admin_prompt "
         # read tmp
 
-        admin_prompt="${BLUE}rvsh:$GREEN$location$BLUE>${NC}"
+        admin_prompt="${BLUE}rvsh:$GREEN$location$BLUE >${NC}"
         history_cmd "$admin_prompt"
 
         tmp="$cmd"
@@ -471,6 +430,7 @@ handle_admin_cmd() {
         case "$cmd" in
 
         'quit' | 'q')
+             
             disconnect "admin" "rvsh"
             return
             ;;
@@ -515,19 +475,7 @@ handle_admin_cmd() {
         
             users $param
             ;;
-
-        # 'cd')
-        #     cd $location $param "admin"
-        #     location=$_new_location
-        #     ;;
-
-        # 'pwd')
-        #     #echo "$location"
-        #     ;;  
-        # 'mkdir')
-        #     #echo "${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')"
-        #     #mkdir ${HOME}${location}/$(echo ${param} | awk -F' ' '{print $1}')  
-        #     ;;      
+    
         '')
             continue
             ;;
@@ -545,32 +493,49 @@ handle_admin_cmd() {
 }
 
 
+# ==== FUNCTION =======================================================
+#
+#        NAME : help_cmd
+# DESCRIPTION : permet d'afficher les commandes disponibles
+# PARAMETER   : Pas de paramètre.
+#
+# =====================================================================
 help_cmd() {
 
     local mode="$1"
     local file=""
 
+    # on selectionne le bon fichier selon
+    # qu'on soit administrateur ou utilisateur
     if [ "$mode" = "admin" ]; then
-        file=$ROOT/.help/admincmd
+        file=$ROOT/sys/help/admincmd
     else
-        file=$ROOT/.help/userscmd
+        file=$ROOT/sys/help/userscmd
     fi
     
-    # on lit le fichier d'aide associé au mode
+    # on lit le fichier d'aide associé au mode et on le formate
     echo -en "$(head -2 $file)\n\n"
     echo -en "$(cat $file | awk -F':' 'NR > 2 {printf "\e[0;33m%-12s\e[0m:%s\n", $1, $2}')\n\n" # don't touch it i'm very proud of that
 }
 
 
-
-####################################################
+# ==== FUNCTION =======================================================
 #
-# SCRIPT BEGINING
+#        NAME : main
+# DESCRIPTION : fonction principale du programme rvsh
+# PARAMETER   : Pas de paramètre.
 #
-####################################################
-
-
+# =====================================================================
 main() {
+
+
+    # on teste si le programme est installé
+    if [ ! -d $ROOT ]; then
+        echo "rvsh is not installed..."
+        install
+    fi
+
+
 
     # parse the command line
     ARGS=$(getopt -o hac:iu -l "help,admin,connect:,install,uninstall" -n "rvsh.sh" -- "$@");
@@ -648,17 +613,19 @@ main() {
 
     done
     
-
     clear
-    echo "
-  _______      _______ _    _ 
- |  __ \ \    / / ____| |  | |
- | |__) \ \  / / (___ | |__| |
- |  _  / \ \/ / \___ \|  __  |
- | | \ \  \  /  ____) | |  | |
- |_|  \_\  \/  |_____/|_|  |_|
- 
-"
+    echo -e "${YELLOW}
+\e[5m
+██████╗ ██╗   ██╗███████╗██╗  ██╗
+██╔══██╗██║   ██║██╔════╝██║  ██║
+██████╔╝██║   ██║███████╗███████║
+██╔══██╗╚██╗ ██╔╝╚════██║██╔══██║
+██║  ██║ ╚████╔╝ ███████║██║  ██║
+╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
+                                 
+  by G. MAHFOUDI & S. JUHEL
+${NC} 
+" 
 
     # si le mode administrateur est actif 
     # il prime sur le mode utilisateur 
@@ -688,8 +655,4 @@ main() {
 
 main "$@"
 
-####################################################
-#
-# SCRIPT END
-#
-####################################################
+# ==== EOF ============================================================
