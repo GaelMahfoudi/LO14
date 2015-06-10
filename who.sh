@@ -57,8 +57,7 @@ who_is_connected_on() {
 		else
 
 			printf "(host) $hostname\n"
-			printf "%-12s %-9s %-9s\n" "user" "hour" "date"
-			echo   "------------ --------  --------"
+			printf "%-12s %-9s %-9s\n" "User" "Hour" "Date"
 
 			# on lit un à un les fichiers de connexions
 			for conn in $ret; do
