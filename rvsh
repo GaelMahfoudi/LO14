@@ -1,33 +1,28 @@
-#===================================================================================
-# file         : rvsh
-# 
-# usage        : rvsh.sh [--admin | --connect <hostname> <username>]
+# =====================================================================
 #
-# description  : commande shell qui permet de creer un réseau virtuel de machines
-#                ainsi que de l'administrer
+#           FILE : rvsh
 #
-# options      : 
-#   -h, --help       show this help message and quit
-#   -a, --admin      log in the virtual machine as administrator
-#   -c, --connect    log in the virtual machine as simple user
-#                    you must specify the hostname and the username.
-#                    (you can connect as a guest, use guest 
-#                    for both username and hostname)
+#          USAGE : rvsh.sh [--admin | --connect <hostname> <username>]
 #
-#   -i, --install    install this program and exit
-#   -u, --uninstall  uninstall this program and exit
+#    DESCRIPTION : fichier source de la commande lsc
 #
 #
-# authors      : G. MAHFOUDI & S. JUHEL
-# company      : UTT
-# version      : 1.0
-# bugs         : 
-# 1 - echo "hostname" a chaque connexion utilisateur
-# 2 - switch user doit changer de repertoires
-# notes        : ---
-# created      : ---
-# revision     : ---
-#===================================================================================
+#         OPTION : 
+#           -h, --help       show this help message and quit
+#           -a, --admin      log in the virtual machine as administrator
+#           -c, --connect    log in the virtual machine as simple user
+#                            you must specify the hostname and the username.
+#                             (you can connect as a guest, use guest 
+#                            for both username and h
+#           -i, --install    install this program and exit
+#           -u, --uninstall  uninstall this program and exit
+#         
+#         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#        COMPANY : UTT
+#        VERSION : 1.0
+#
+# =====================================================================
+
 
 # === INCLUDES ========================================================
 
@@ -38,8 +33,8 @@ source commands/admin/host.sh
 source commands/admin/lsc.sh
 
 # shared
-source commands/shared/cd.sh
 source commands/shared/handle_connections.sh
+source commands/shared/rvsh_cd.sh
 source commands/shared/rvsh_ls.sh
 source commands/shared/rvsh_mkdir.sh
 source commands/shared/rvsh_rm.sh
@@ -115,7 +110,7 @@ install() {
 
     # on extrait l'architecture de rvsh dans le 
     # repertoire racine
-    tar xvzf ./install/arch.tar.gz -C $ROOT/
+    tar xvzf ./install/filesystem.tar.gz -C $ROOT/
 
     # on configure le mot de passe administrateur
     echo ""
@@ -300,22 +295,23 @@ handle_users_cmd() {
     local cmd=""    # commande entree par l'utilisateur
 
     local user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW} >${NC}"
-    location="/$username"
+    location="/rvsh/host/$hostname/$username"
     
     while [ "$cmd" != "quit" ]
     do
 
 
-        user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$location${YELLOW} >${NC}"
+        user_prompt="${YELLOW}${username}@${YELLOW}${hostname}:${GREEN}$(echo $location | \
+        awk -F "/rvsh/host/$hostname" '{print $2}')${YELLOW}>${NC}"
         history_cmd "$user_prompt"
 
 
-        tmp=$cmd
+        tmp="$cmd"
 
         cmd=($tmp)
         cmd=${cmd[0]}
-        param=${tmp:${#cmd}}
-
+        param=${tmp:$((${#cmd}+1))}
+        
         check_msg $username
 
         # lecture de la commande entree
@@ -332,20 +328,23 @@ handle_users_cmd() {
             ;;
 
         'cd') 
-            cd $location "$param" "admin"
+            rvsh_cd $location $param
             location=$_new_location
             ;;
 
         'ls')
-            echo "$location"
-            rvsh_ls $location "$param"
+            rvsh_ls $location $param
+            ;;
+
+        'nano')
+            nano $HOME$location/$param
             ;;
 
         'mkdir')
             rvsh_mkdir $location $param
             ;;
 
-        'rmdir')
+        'rm')
             rvsh_rm $location $param "$username"
             ;;
 
@@ -440,12 +439,16 @@ handle_admin_cmd() {
             ;;
 
         'cd')
-            cd $location "$param" "admin"
+            rvsh_cd $location "$param" "admin"
             location=$_new_location
             ;;
 
         'ls')
             rvsh_ls $location "$param"
+            ;;
+
+        'nano')
+            nano $HOME$location/$param
             ;;
 
         'mkdir')
@@ -632,15 +635,12 @@ ${NC}
     #
     if [ "$admin_flag" = "on" ]; then
 
-        
-        
         connect "admin" "rvsh" && \
         write_logs "admin" "rvsh" "connected" &&\
         handle_admin_cmd 
 
-    elif [ "$user_flag" = "on" -a -z "$admin_flag" ]; then
+    elif [ "$user_flag" = "on" ] && [ -z "$admin_flag" ]; then
 
-        
         connect "$username" "$hostname" && \
         write_logs "$username" "$hostname" "connected" && \
         handle_users_cmd "$username" "$hostname" "$(date +%T)"

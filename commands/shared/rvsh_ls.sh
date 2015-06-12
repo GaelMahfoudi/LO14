@@ -1,5 +1,3 @@
-#!/bin/bash 
-
 # =====================================================================
 #
 #           FILE : ls.sh
@@ -7,11 +5,12 @@
 #          USAGE : ls [Dossier]
 #
 #    DESCRIPTION : Permet à l'utilisateur ou l'administrateur d'afficher 
-#				   le contenu du répertoire courant ou d'un dossier.
+#				   le contenu du répertoire courant ou d'un dossier cible.
 #
 #
 #         OPTION : 
 #         AUTHOR : Gaël Mahfoudi & Simon Juhel
+#
 # =====================================================================
 
 
@@ -30,7 +29,7 @@ rvsh_ls() {
 		then
 			ls -F $HOME$location$cible
 		else
-			echo "$location$cible : No such directory"
+			echo "$location$cible : No such a directory"
 		fi
 	fi
 	

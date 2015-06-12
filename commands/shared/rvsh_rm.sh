@@ -1,5 +1,3 @@
-#!/bin/bash 
-
 # =====================================================================
 #
 #           FILE : rvsh_rm.sh
@@ -21,9 +19,9 @@ rvsh_rm() {
 	local dir_name=$2
 	local user=$3
 
-	if 	[ "$(echo $location$dir_name | awk -F "/" '{print $(NF-1)}')" = "host" ] || \
-		[ "$(echo $location$dir_name | awk -F "/" '{print $(NF-1)}')" = "users" ] || \
-		[ "$(echo $location$dir_name | awk -F "/" '{print $(NF-1)}')" = "sys" ]
+	if 	[ "$(echo $location/$dir_name | awk -F "/" '{print $(NF-1)}')" = "host" ] || \
+		[ "$(echo $location/$dir_name | awk -F "/" '{print $(NF-1)}')" = "users" ] || \
+		[ "$(echo $location/$dir_name | awk -F "/" '{print $(NF-1)}')" = "sys" ]
 	then
 		echo "You cannot remove $location$dir_name"
 		return
@@ -38,7 +36,8 @@ rvsh_rm() {
 					then 
 						echo "You cannot remove $dir_name"
 					else
-						if [ \( -d ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) -o \( -e ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) ]
+						if [ \( -d ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) -o \
+						     \( -e ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) ]
 						then
 							rm -r ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}')
 						else
@@ -55,7 +54,8 @@ rvsh_rm() {
 
 					if [  "$(echo $location | awk -F "/" '{print $(NF-1)}')" != "host" -a "$(echo $location | awk -F "/" '{print $(NF-1)}')" != "users" ]
 					then
-						if [ \( -d ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) -o \( -e ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) ]
+						if [ \( -d ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) -o \
+						     \( -e ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) ]
 						then
 							rm -r ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}')
 						else
@@ -66,5 +66,14 @@ rvsh_rm() {
 					fi
 				;;
 		esac
+
+	else
+		if [ \( -d ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) -o \
+						     \( -e ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}') \) ]
+		then
+			rm -r ${HOME}${location}/$(echo ${dir_name} | awk -F' ' '{print $1}')
+		else
+			echo "No such a directory"
+		fi
 	fi
 }

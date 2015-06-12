@@ -19,13 +19,13 @@ rvsh_mkdir() {
 	local location=$1
 	local dir_name=$2
 
-	if [ "$(echo $location$dir_name | awk -F "/" '{print $(NF-1)}')" = "host" -o "$(echo $location$dir_name | awk -F "/" '{print $(NF-1)}')" = "users" ]
+	if [ "$(echo $location/$dir_name | awk -F "/" '{print $(NF-1)}')" = "host" -o "$(echo $location/$dir_name | awk -F "/" '{print $(NF-1)}')" = "users" ]
 	then
-		echo "You cannot create $location$dir_name"
+		echo "You cannot create $location/$dir_name"
 		return
 	fi
 
-	if [ "$(echo $location$dir_name | awk -F "/" '{print $(NF-2)}')" = "host" ]
+	if [ "$(echo $location/$dir_name | awk -F "/" '{print $(NF-2)}')" = "host" ]
 	then
 		echo "You cannot create $location$dir_name"
 		return

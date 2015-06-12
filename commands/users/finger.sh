@@ -76,7 +76,7 @@ finger() {
 		printf "Mails:\n"
 		echo "$mail_list"
 
-		printf "Phones:\n"
+		printf "\nPhones:\n"
 		echo "$phone_list"
 
 	fi
