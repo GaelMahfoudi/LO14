@@ -21,11 +21,11 @@ rvsh_ls() {
 	local cible=$2
 
 
-	if [ "$cible" = "" ]
+	if [ "$cible" = "" ]								#Si on a pas précisé de paramètre à ls, on affiche le contenu du répertoire courant
 	then
 		ls -F $HOME$location
 	else
-		if [ -d $HOME$location$cible ]
+		if [ -d $HOME$location$cible ]					#Si on a précisé un paramètre à ls, on affiche le contenu du répertoire cible.
 		then
 			ls -F $HOME$location$cible
 		else

@@ -328,7 +328,7 @@ handle_users_cmd() {
             ;;
 
         'cd') 
-            rvsh_cd $location $param
+            rvsh_cd $location $param $username $hostname
             location=$_new_location
             ;;
 
@@ -439,7 +439,7 @@ handle_admin_cmd() {
             ;;
 
         'cd')
-            rvsh_cd $location "$param" "admin"
+            rvsh_cd $location "$param" "admin" "rvsh"
             location=$_new_location
             ;;
 
