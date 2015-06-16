@@ -30,7 +30,7 @@ ROOT="$HOME/rvsh"
 # =====================================================================
 function add_phone {
 
-    if [ ! -e $ROOT/users/$1/phones ]
+    if [ ! -e $ROOT/users/$1/phones ]  #Si le fichier phones n'existe pas, on le crée
     then
         touch $ROOT/users/$1/phones
     fi
@@ -38,15 +38,15 @@ function add_phone {
     phoneList=$(cat $ROOT/users/$1/phones)
     phoneCout=$(($(cat $ROOT/users/$1/phones | wc -l)))
 
-    if [ "$phoneList" = "" ]
+    if [ "$phoneList" = "" ]            #Si il n'y a pas de téléphone dans le fichier, on propose d'en ajouter un
     then
     	echo "The user $1 has no phone numbers registered"
     	read -p "Add a new phone : " newPhone
     	echo -en "$newPhone\n" >> $ROOT/users/$1/phones
-    else
+    else                                #Sinon on propose le choix ajouter/supprimer
 
     	j=1
-    	for i in $phoneList
+    	for i in $phoneList             #On affiche la liste des téléphones
     	do
     		echo "$j) $i"
 			j=$(($j+1))
@@ -55,17 +55,17 @@ function add_phone {
         first="o"
 		choice=""
         echo -e "\n"
-		while [ ! \( "$choice" = "add" -o "$choice" = "del" \) ]
+		while [ ! \( "$choice" = "add" -o "$choice" = "del" \) ]  #Tant que le choix n'est pas valable
 		do
             echo -en "Would you like to add or del one ? (add/del) : "
             read choice
 		done
 
-		if [ "$choice" = "add" ]
+		if [ "$choice" = "add" ]                                  #Si le choix est "add", on en ajoute un
 		then
 			read -p "Add a new phone : " newPhone
 			echo -en "$newPhone\n" >> $ROOT/users/$1/phones
-		else
+		else                                                      #Sinon on supprime le numéro du fichier
 			read -p "Which one would you like to remove ? : " phoneToDel
             phoneToDel=${phoneToDel}'d'
             tmp=$(sed $phoneToDel "$ROOT/users/$1/phones")
@@ -93,6 +93,10 @@ function add_phone {
 #
 # =====================================================================
 function add_mail {
+
+
+    #Le fonctionnement de la fonction add_mail est analogue à la fonction add_phones
+    #Voir les commentaires de add_phone pour comprendre le fonctionnement.
 
     if [ ! -e $ROOT/users/$1/mails ]
     then
