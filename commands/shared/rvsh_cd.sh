@@ -103,6 +103,7 @@ rvsh_cd() {
 
 	else										#Si l'utilisateur n'est pas administrateur
 
+		bit
 		case $_direction in
 
 			'..') #Si il demande à retourner en arrière.

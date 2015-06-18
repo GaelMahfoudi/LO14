@@ -149,9 +149,9 @@ uninstall() {
 #
 # =====================================================================
 ReadKey() {
-    # Wait for first char
+    # On attends le premier caractère
     if IFS="" read -n1 _REPLY; then
-      # Read rest of chars
+      # On lit le reste du tampon
       while read -n1 -t 0.001 ; do
         _REPLY+="${REPLY}"
       done
@@ -170,116 +170,119 @@ ReadKey() {
 # =====================================================================
 history_cmd() {
 
-    if [ ! -e $ROOT/hist ]
+    if [ ! -e $ROOT/hist ]  #Si le fichier hist n'existe pas, on le crée
     then
         touch $ROOT/hist
         echo -e "\n" >> $ROOT/hist
     fi
 
 
-    stop="n"
-    gd="n"
-    i=$((1))
-    tailleHist=$(($(cat $ROOT/hist | wc -l)))
-    cmd=""
-    posCurs=$((0))
-    while [ "$stop" = "n" ]
+    stop="n" #Indicateur d'arrêt de la lecture de la commande      
+    i=$((1)) #Numéro de ligne de la commande à récupérer
+    tailleHist=$(($(cat $ROOT/hist | wc -l))) #Nombre de ligne de l'historique de commande
+    cmd="" #La commande écrite
+    posCurs=$((0)) #Position du curseur dans la commande
+
+
+    while [ "$stop" = "n" ] #Tant que l'utilisateur saisit des caractères 
     do
 
-        stop="o"
+        stop="o" 
 
-      
-        tmpCmd=${cmd:0:$(($posCurs))}
+        
+        #On efface la ligne courante, puis on écrit le prompt ainsi que la commande de l'utilisateur.
+        #On revient au début de ligne, puis on réecrit le prompt et la commande jusqu'à la position du curseur.
+        tmpCmd=${cmd:0:$(($posCurs))} #
         echo -en "\r$(echo "$1 $cmd" | sed 's/./ /g')    \r"
         echo -en "$1 $cmd"
         echo -en "\r"
         echo -en "$1 $tmpCmd"
         
 
-      tailleCmd=${#cmd}
-      gd="n"
-      ReadKey
+      tailleCmd=${#cmd} #On actualise la taille de la commande
+      ReadKey #on lit l'entrée clavier
 
       
       case $_REPLY in
-        [A)
+        [A) #Si on appuie sur la touche HAUT
 
-                i=$((i-1))
+                i=$((i-1)) #On monte d'une ligne dans le fichier historique
 
-                if [ $i -eq 0 ]
+                if [ $i -eq 0 ] #Si on est en haut, on retourne en bas
                 then
                   i=$((tailleHist))
                 fi
 
-                cmd=$(sed -n ${i}p $ROOT/hist)
+                cmd=$(sed -n ${i}p $ROOT/hist) #On actualise la commande
 
-                posCurs=$((${#cmd}+1))
+                posCurs=$((${#cmd}+1)) #On actualise la position du curseur
 
                 stop="n";;
 
 
-        [B )
+        [B ) #Si on appuie sur la touche BAS
 
 
-                i=$((i+1))
+                i=$((i+1)) #On descend d'une ligne dans le fichier historique
 
-                if [ $i -eq $(($tailleHist+1)) ]
+                if [ $i -eq $(($tailleHist+1)) ] #Si on est en bas, on retourne en haut
                 then
                   i=$((1))
                 fi
 
-                cmd=$(sed -n ${i}p $ROOT/hist)
+                cmd=$(sed -n ${i}p $ROOT/hist) #On actualise la commande
 
-                posCurs=$((${#cmd}+1))
+                posCurs=$((${#cmd}+1)) #On actualise la position du curseur
 
                 stop="n";;
 
-        [C ) 
-                if [ ! $posCurs -eq $tailleCmd  ]
+        [C ) #Si on appuie sur la touche DROITE
+                if [ ! $posCurs -eq $tailleCmd  ] #On bouge le curseur à droite si il n'est pas au bout de la commande
                 then
                     posCurs=$(($posCurs+1))
                 fi
 
 
                 stop="n"
-                gd="o"
                 ;;
 
-        [D ) 
-                if [ ! $posCurs -eq 0 ]
+        [D ) #Si on appuie sur la touche GAUCHE
+                if [ ! $posCurs -eq 0 ] #On bouge le curseur à gauche si il n'est pas au début de la commande
                 then
                     posCurs=$(($posCurs-1))
                 fi
 
                 stop="n"
-                gd="o"
                 ;;
 
-        )
-                if [ "$cmd" != "" ]
+        )      #Si on appuie sur la touche Effacer
+                if [ "$cmd" != "" ] #Si la commande n'est pas vide
                 then
-                  cmd=${cmd:0:$(($posCurs-1))}${cmd:$posCurs}
-                  tailleCmd=$(($tailleCmd-1))
-                  if [ ! $posCurs -eq 0 ]
+                  cmd=${cmd:0:$(($posCurs-1))}${cmd:$posCurs} #On supprime le caractère juste avant le curseur
+                  tailleCmd=$(($tailleCmd-1)) #On diminue la taille de la commande de 1
+                  if [ ! $posCurs -eq 0 ] #Si le curseur n'est pas à 0 on le fait reculer d'un caractère
                   then
                     posCurs=$(($posCurs-1))
                   fi
-                else
+                else    #Si la commande est vide on ne fait rien
                   cmd=""
                 fi
                 stop="n";;
-        "")     stop="o";;
-        *)      
-                tmpCmdStart=${cmd:0:$(($posCurs))}
-                tmpCmdEnd=${cmd:$(($posCurs))}
-                cmd=$tmpCmdStart$_REPLY$tmpCmdEnd
-                tailleCmd=$(($tailleCmd+1))
-                posCurs=$(($posCurs+1))
+
+        "")     stop="o";; #Si on appuie sur ENTREE on quitte
+
+        *)      #Si un caractère a été saisit
+
+                tmpCmdStart=${cmd:0:$(($posCurs))} #On récupère le début de la commande jusqu'au curseur
+                tmpCmdEnd=${cmd:$(($posCurs))}     #On récupère la fin de la commande après le curseur
+                cmd=$tmpCmdStart$_REPLY$tmpCmdEnd  #On insère le caractère à la position du curseur
+                tailleCmd=$(($tailleCmd+1))        #On augmente la taille de la commande
+                posCurs=$(($posCurs+1))            #On augmente la position du curseur
                 stop="n";;
       esac
     done
 
-    if [ "$cmd" != "" ]
+    if [ "$cmd" != "" ]         #Si la commande saisit n'était pas vide on l'ajoute à l'historique
     then
         echo -e "$cmd" >> $ROOT/hist
     fi
